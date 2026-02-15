@@ -1,0 +1,62 @@
+# Copyright 2026 John Salerno.
+
+name: CI
+
+on:
+  push:
+    branches: ["main", "codex/**"]
+  pull_request:
+
+jobs:
+  macos-test:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Lint
+        run: ./scripts/lint.sh
+
+      - name: Unit tests
+        run: swift test
+
+      - name: Vulnerability scan
+        run: ./scripts/vulnerability_scan.sh
+
+      - name: Upload vulnerability report
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: reports/vulnerability_report.*
+
+  ios-simulator-build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build package for iOS simulator
+        run: |
+          xcodebuild -scheme ButterflyButton-Package \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath .build/DerivedData \
+            build
+
+  ipados-simulator-build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build package for iPadOS simulator
+        run: |
+          xcodebuild -scheme ButterflyButton-Package \
+            -destination 'generic/platform=iOS Simulator,name=iPad' \
+            -derivedDataPath .build/DerivedData \
+            build
