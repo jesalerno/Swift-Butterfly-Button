@@ -229,7 +229,7 @@ struct MedallionView: View {
 }
 
 private enum DefaultStoneImageCache {
-    private static let logger = Logger(subsystem: "com.yourorg.ButterflyButton", category: "resources")
+    private static let logger = Logger(subsystem: "com.integracode.ButterfylButton", category: "resources")
 
     private static let names = [
         "white-stone-64",

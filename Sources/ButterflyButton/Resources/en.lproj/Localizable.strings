@@ -2,3 +2,8 @@
 
 "ButterflyButton.true" = "true";
 "ButterflyButton.false" = "false";
+"ButterflyButton.accessibility.label" = "Butterfly button";
+"ButterflyButton.accessibility.hint" = "Double-tap to toggle the butterfly button state.";
+"ButterflyButton.accessibility.action.toggle" = "Toggle";
+"ButterflyButton.accessibility.state.on" = "On";
+"ButterflyButton.accessibility.state.off" = "Off";

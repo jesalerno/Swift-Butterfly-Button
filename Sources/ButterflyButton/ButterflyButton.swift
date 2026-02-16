@@ -12,6 +12,11 @@ public struct ButterflyButton: View {
         static let minimumHitSize: CGFloat = 44
         static let labelPadding: CGFloat = 2
         static let controlOpacityWhenDisabled: CGFloat = 0.72
+        static let accessibilityLabel: LocalizedStringKey = "ButterflyButton.accessibility.label"
+        static let accessibilityHint: LocalizedStringKey = "ButterflyButton.accessibility.hint"
+        static let accessibilityToggleAction: LocalizedStringKey = "ButterflyButton.accessibility.action.toggle"
+        static let accessibilityStateOn: LocalizedStringKey = "ButterflyButton.accessibility.state.on"
+        static let accessibilityStateOff: LocalizedStringKey = "ButterflyButton.accessibility.state.off"
     }
 
     private enum MotionConstants {
@@ -49,7 +54,7 @@ public struct ButterflyButton: View {
     @State private var pulseScale: CGFloat = 1
     @State private var coordinator = ButterflyInteractionCoordinator()
 
-    private let logger = Logger(subsystem: "com.yourorg.ButterflyButton", category: "control")
+    private let logger = Logger(subsystem: "com.integracode.ButterflyButton", category: "control")
 
     /// Stores validated and resolved render values for a single frame.
     private struct ResolvedValues {
@@ -233,14 +238,26 @@ public struct ButterflyButton: View {
         .contentShape(Rectangle())
         .gesture(spinGesture(resolved: resolved))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text("ButterflyButton"))
-        .accessibilityValue(Text(isOn ? style.medallionTopLabel : style.medallionBottomLabel))
-        .accessibilityAction(named: Text("Toggle")) {
-            guard isEnabled else { return }
-            triggerSpin(direction: isOn ? .topToBottom : .bottomToTop, velocity: 0, duration: resolved.validDuration)
+        .accessibilityLabel(Text(UIConstants.accessibilityLabel))
+        .accessibilityValue(Text(isOn ? UIConstants.accessibilityStateOn : UIConstants.accessibilityStateOff))
+        .accessibilityHint(Text(UIConstants.accessibilityHint))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(named: Text(UIConstants.accessibilityToggleAction)) {
+            performToggleAccessibilityAction(duration: resolved.validDuration)
+        }
+        .accessibilityAction {
+            performToggleAccessibilityAction(duration: resolved.validDuration)
         }
         .frame(minWidth: UIConstants.minimumHitSize, minHeight: UIConstants.minimumHitSize)
         .allowsHitTesting(isEnabled)
+    }
+
+    /// Executes the accessibility toggle action when the control is enabled.
+    ///
+    /// - Parameter duration: Spin duration to use for the toggle action.
+    private func performToggleAccessibilityAction(duration: TimeInterval) {
+        guard isEnabled else { return }
+        triggerSpin(direction: isOn ? .topToBottom : .bottomToTop, velocity: 0, duration: duration)
     }
 
     /// Creates the drag gesture used to infer spin direction and velocity.
