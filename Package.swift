@@ -23,24 +23,39 @@ let package = Package(
             targets: ["ButterflyButtoniOSDemo"]
         )
     ],
+    dependencies: [
+        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.59.1")
+    ],
     targets: [
         .target(
             name: "ButterflyButton",
-            resources: [.process("Resources")]
+            resources: [.process("Resources")],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .executableTarget(
             name: "ButterflyButtonMacDemo",
             dependencies: ["ButterflyButton"],
-            path: "Examples/ButterflyButtonMacDemo"
+            path: "Examples/ButterflyButtonMacDemo",
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .executableTarget(
             name: "ButterflyButtoniOSDemo",
             dependencies: ["ButterflyButton"],
-            path: "Examples/ButterflyButtoniOSDemo"
+            path: "Examples/ButterflyButtoniOSDemo",
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
         .testTarget(
             name: "ButterflyButtonTests",
-            dependencies: ["ButterflyButton"]
+            dependencies: ["ButterflyButton"],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         )
     ]
 )
