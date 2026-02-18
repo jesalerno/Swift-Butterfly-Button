@@ -138,7 +138,9 @@ extension ButterflyValidation {
         let validSpeed = validSpinSpeed(spinSpeed)
         let clampedVelocity = (velocity.isFinite && velocity > 0) ? velocity : 0
         let baseDegrees = 1080.0 * validDuration * validSpeed
-        let velocityBoost = enableFlickPhysics ? min(Double(clampedVelocity) * 0.6, 900) : 0
+        let velocityBoost = enableFlickPhysics
+            ? min(Double(clampedVelocity) * 0.6, 900)
+            : 0
         let rawDegrees = max(baseDegrees + velocityBoost, 180)
 
         var halfTurns = Int(rawDegrees / 180.0)
@@ -209,3 +211,4 @@ extension ButterflyValidation {
         return Double(halfTurns) * 180.0
     }
 }
+

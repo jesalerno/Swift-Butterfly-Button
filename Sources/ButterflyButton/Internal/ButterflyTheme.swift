@@ -2,6 +2,18 @@
 
 import SwiftUI
 
+struct ThemeInput {
+    let colorScheme: ColorScheme
+    let contrast: ColorSchemeContrast
+    let isEnabled: Bool
+    let mountStrokeColor: Color?
+    let axleColor: Color?
+    let medallionTopColor: Color?
+    let medallionBottomColor: Color?
+    let medallionEdgeColor: Color?
+    let medallionLabelColor: Color?
+}
+
 /// Resolved color values used by `ButterflyButton` rendering primitives.
 struct ButterflyTheme {
     let mountStroke: Color
@@ -12,46 +24,71 @@ struct ButterflyTheme {
     let medallionEdge: Color
     let medallionLabel: Color
 
+    // MARK: - Theme Constants
+    /// Namespaced constants for `ButterflyTheme`.
+    enum Constants {
+        // MARK: Background
+        /// Opacity for the mount background when the system is in Dark Mode.
+        static let DARK_MOUNT_BACKGROUND_OPACITY: Double = 0.08
+        /// Opacity for the mount background when the system is in Light Mode.
+        static let LIGHT_MOUNT_BACKGROUND_OPACITY: Double = 0.04
+
+        // MARK: Contrast
+        /// Opacity for the medallion edge when not in increased contrast mode.
+        static let MEDALLION_EDGE_LOW_CONTRAST_OPACITY: Double = 0.7
+
+        // MARK: Disabled state
+        /// Base opacity for disabled surfaces (HIG range 0.06–0.12).
+        static let DISABLED_OPACITY: Double = 0.09
+        /// Opacity for the mount stroke when disabled.
+        static let DISABLED_STROKE_OPACITY: Double = 0.6
+        /// Opacity for the axle when disabled.
+        static let DISABLED_AXLE_OPACITY: Double = 0.09
+        /// Opacity for the medallion top face when disabled.
+        static let DISABLED_MEDALLION_TOP_OPACITY: Double = 0.45
+        /// Opacity for the medallion bottom face when disabled.
+        static let DISABLED_MEDALLION_BOTTOM_OPACITY: Double = 0.65
+        /// Opacity for the medallion edge when disabled.
+        static let DISABLED_MEDALLION_EDGE_OPACITY: Double = 0.7
+        /// Opacity for the medallion label when disabled.
+        static let DISABLED_MEDALLION_LABEL_OPACITY: Double = 0.85
+    }
+
+    // MARK: - Test/Preview Constants (exposed for testability)
+    /// A small set of constants exposed for tests and previews.
+    enum PreviewConstants {
+        /// Opacity for the mount background in Dark Mode.
+        static let DARK_MOUNT_BACKGROUND_OPACITY = Constants.DARK_MOUNT_BACKGROUND_OPACITY
+        /// Opacity for the mount background in Light Mode.
+        static let LIGHT_MOUNT_BACKGROUND_OPACITY = Constants.LIGHT_MOUNT_BACKGROUND_OPACITY
+        /// Disabled base opacity for surfaces.
+        static let DISABLED_OPACITY = Constants.DISABLED_OPACITY
+    }
+
     /// Resolves theme colors from environment and style overrides.
     ///
     /// - Parameters:
-    ///   - colorScheme: Current color scheme.
-    ///   - contrast: Current contrast setting.
-    ///   - isEnabled: Whether control is enabled.
-    ///   - mountStrokeColor: Optional mount stroke override.
-    ///   - axleColor: Optional axle color override.
-    ///   - medallionTopColor: Optional top-face color override.
-    ///   - medallionBottomColor: Optional bottom-face color override.
-    ///   - medallionEdgeColor: Optional medallion edge color override.
-    ///   - medallionLabelColor: Optional medallion label color override.
+    ///   - input: A `ThemeInput` struct containing environment and override parameters.
     /// - Returns: Resolved theme colors.
-    static func resolve(
-        colorScheme: ColorScheme,
-        contrast: ColorSchemeContrast,
-        isEnabled: Bool,
-        mountStrokeColor: Color?,
-        axleColor: Color?,
-        medallionTopColor: Color?,
-        medallionBottomColor: Color?,
-        medallionEdgeColor: Color?,
-        medallionLabelColor: Color?
-    ) -> Self {
-        if !isEnabled {
-            return Self.disabled(colorScheme: colorScheme)
+    static func resolve(_ input: ThemeInput) -> Self {
+        if !input.isEnabled {
+            return Self.disabled(colorScheme: input.colorScheme)
         }
 
-        let highContrast = contrast == .increased
-        let baseStroke = mountStrokeColor ?? .secondary
-        let baseAxle = axleColor ?? .accentColor
+        let highContrast = input.contrast == .increased
+        let baseStroke = input.mountStrokeColor ?? .secondary
+        let baseAxle = input.axleColor ?? .accentColor
 
         return Self(
             mountStroke: highContrast ? .primary : baseStroke,
-            mountBackground: colorScheme == .dark ? Color.white.opacity(0.08) : Color.black.opacity(0.04),
+            mountBackground: input.colorScheme == .dark
+                ? Color.white.opacity(Constants.DARK_MOUNT_BACKGROUND_OPACITY)
+                : Color.black.opacity(Constants.LIGHT_MOUNT_BACKGROUND_OPACITY),
             axle: highContrast ? .primary : baseAxle,
-            medallionTop: medallionTopColor ?? .accentColor,
-            medallionBottom: medallionBottomColor ?? .secondary,
-            medallionEdge: medallionEdgeColor ?? .primary.opacity(highContrast ? 1 : 0.7),
-            medallionLabel: medallionLabelColor ?? .primary
+            medallionTop: input.medallionTopColor ?? .accentColor,
+            medallionBottom: input.medallionBottomColor ?? .secondary,
+            medallionEdge: input.medallionEdgeColor ?? .primary.opacity(highContrast ? 1 : Constants.MEDALLION_EDGE_LOW_CONTRAST_OPACITY),
+            medallionLabel: input.medallionLabelColor ?? .primary
         )
     }
 
@@ -60,15 +97,16 @@ struct ButterflyTheme {
     /// - Parameter colorScheme: Current color scheme.
     /// - Returns: Theme values for disabled rendering.
     private static func disabled(colorScheme: ColorScheme) -> Self {
-        let bg = colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.06)
+        let background = Color.secondary.opacity(Constants.DISABLED_OPACITY)
         return Self(
-            mountStroke: .secondary.opacity(0.6),
-            mountBackground: bg,
-            axle: .secondary.opacity(0.6),
-            medallionTop: .gray.opacity(0.45),
-            medallionBottom: .gray.opacity(0.65),
-            medallionEdge: .secondary.opacity(0.7),
-            medallionLabel: .white.opacity(0.85)
+            mountStroke: .secondary.opacity(Constants.DISABLED_STROKE_OPACITY),
+            mountBackground: background,
+            axle: .secondary.opacity(Constants.DISABLED_AXLE_OPACITY),
+            medallionTop: .gray.opacity(Constants.DISABLED_MEDALLION_TOP_OPACITY),
+            medallionBottom: .gray.opacity(Constants.DISABLED_MEDALLION_BOTTOM_OPACITY),
+            medallionEdge: .secondary.opacity(Constants.DISABLED_MEDALLION_EDGE_OPACITY),
+            medallionLabel: .white.opacity(Constants.DISABLED_MEDALLION_LABEL_OPACITY)
         )
     }
 }
+

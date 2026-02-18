@@ -21,6 +21,7 @@ struct MountView: View {
     let strokeColor: Color
     let background: MountBackground
     let systemBackground: Color
+    let reduceTransparencyEnabled: Bool
 
     var body: some View {
         ZStack {
@@ -41,6 +42,12 @@ struct MountView: View {
             Rectangle().fill(.clear)
         case let .color(color):
             Rectangle().fill(color)
+        case let .material(material):
+            if reduceTransparencyEnabled {
+                Rectangle().fill(systemBackground) // opaque fallback per HIG
+            } else {
+                Rectangle().fill(material)
+            }
         case let .image(image):
             image
                 .resizable()
@@ -205,12 +212,24 @@ struct MedallionView: View {
         switch shape {
         case .square:
             candidateNames = visibleTop
-                ? ["square-white-stone-64", "square-white-stone-128"]
-                : ["square-black-stone-64", "square-black-stone-128"]
+                ? [
+                    "square-white-stone-64",
+                    "square-white-stone-128"
+                  ]
+                : [
+                    "square-black-stone-64",
+                    "square-black-stone-128"
+                  ]
         case .circle:
             candidateNames = visibleTop
-                ? ["white-stone-64", "white-stone-128"]
-                : ["black-stone-64", "black-stone-128"]
+                ? [
+                    "white-stone-64",
+                    "white-stone-128"
+                  ]
+                : [
+                    "black-stone-64",
+                    "black-stone-128"
+                  ]
         }
 
         for name in candidateNames {

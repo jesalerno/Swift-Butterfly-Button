@@ -252,10 +252,15 @@ private struct DeterministicRNG {
     #expect(ButterflyAnimationMode.from(reduceMotion: true) == .reducedMotion)
     #expect(ButterflyAnimationMode.from(reduceMotion: false) == .spin)
 
-    #expect(ButterflyValidation.rotationAxis(for: .horizontal) == ButterflyRotationAxis(x: 1, y: 0, z: 0))
-    #expect(ButterflyValidation.rotationAxis(for: .vertical) == ButterflyRotationAxis(x: 0, y: 1, z: 0))
-    #expect(ButterflyValidation.rotationAxis(for: .diagonalLTR) == ButterflyRotationAxis(x: 1, y: 1, z: 0))
-    #expect(ButterflyValidation.rotationAxis(for: .diagonalRTL) == ButterflyRotationAxis(x: 1, y: -1, z: 0))
+    let expectedH = ButterflyRotationAxis(x: 1, y: 0, z: 0)
+    let expectedV = ButterflyRotationAxis(x: 0, y: 1, z: 0)
+    let expectedLTR = ButterflyRotationAxis(x: 1, y: 1, z: 0)
+    let expectedRTL = ButterflyRotationAxis(x: 1, y: -1, z: 0)
+
+    #expect(ButterflyValidation.rotationAxis(for: .horizontal) == expectedH)
+    #expect(ButterflyValidation.rotationAxis(for: .vertical) == expectedV)
+    #expect(ButterflyValidation.rotationAxis(for: .diagonalLTR) == expectedLTR)
+    #expect(ButterflyValidation.rotationAxis(for: .diagonalRTL) == expectedRTL)
 }
 
 /// Validates coordinator behavior for in-bound, out-of-bound, expected handling, and fuzzed sequences.
@@ -286,3 +291,4 @@ private struct DeterministicRNG {
         }
     }
 }
+

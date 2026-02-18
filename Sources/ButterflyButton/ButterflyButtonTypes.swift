@@ -22,6 +22,7 @@ public enum MountBackground {
     case transparent
     case color(Color)
     case image(Image)
+    case material(Material)
 }
 
 public enum SpinDirection: Sendable, Equatable {

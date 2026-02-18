@@ -2,6 +2,9 @@
 
 import OSLog
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 @MainActor
 /// A flip-style SwiftUI toggle control with gesture-driven animation.
@@ -38,9 +41,9 @@ public struct ButterflyButton: View {
     public var enableFlickPhysics: Bool = true
     public var hapticsEnabled: Bool = true
 
-    public var onSpinBegan: (() -> Void)? = nil
-    public var onSpinCompleted: ((_ isOn: Bool) -> Void)? = nil
-    public var onSpinEnded: ((_ isOn: Bool) -> Void)? = nil
+    public var onSpinBegan: (() -> Void)?
+    public var onSpinCompleted: ((_ isOn: Bool) -> Void)?
+    public var onSpinEnded: ((_ isOn: Bool) -> Void)?
 
     private var outerLabel: AnyView?
 
@@ -49,6 +52,9 @@ public struct ButterflyButton: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+    @Environment(\.accessibilityShowButtonShapes) private var showButtonShapes
 
     @State private var rotationDegrees: Double = 0
     @State private var pulseScale: CGFloat = 1
@@ -168,55 +174,29 @@ public struct ButterflyButton: View {
         .opacity(isEnabled ? 1.0 : UIConstants.controlOpacityWhenDisabled)
     }
 
-    private var resolvedValues: ResolvedValues {
-        let clampedSide = ButterflyValidation.clampedSideLength(sideLength)
-        let clampedStroke = ButterflyValidation.clampedMountStrokeWidth(style.mountStrokeWidth, sideLength: clampedSide)
-        let validDuration = ButterflyValidation.validSpinDuration(spinDecelerationDuration)
-
-        let theme = ButterflyTheme.resolve(
-            colorScheme: colorScheme,
-            contrast: colorSchemeContrast,
-            isEnabled: isEnabled,
-            mountStrokeColor: style.mountStrokeColor,
-            axleColor: style.axleColor,
-            medallionTopColor: style.medallionTopColor,
-            medallionBottomColor: style.medallionBottomColor,
-            medallionEdgeColor: style.medallionEdgeColor,
-            medallionLabelColor: style.medallionLabelColor
-        )
-
-        return ResolvedValues(
-            clampedSide: clampedSide,
-            clampedStroke: clampedStroke,
-            validDuration: validDuration,
-            theme: theme,
-            medallionDiameter: ButterflyValidation.medallionDiameter(sideLength: clampedSide, strokeWidth: clampedStroke),
-            rotationAxis: ButterflyValidation.rotationAxis(for: style.axleOrientation)
-        )
-    }
-
     /// Builds the interactive control surface and accessibility behavior.
     ///
     /// - Parameter resolved: Precomputed render values for current state.
     /// - Returns: A view tree for the control surface.
     private func controlSurface(resolved: ResolvedValues) -> some View {
         ZStack {
-            MountView(
+            ButterflyButtonViewBuilders.mountLayer(
                 sideLength: resolved.clampedSide,
                 strokeWidth: resolved.clampedStroke,
                 strokeColor: resolved.theme.mountStroke,
                 background: style.mountBackground,
-                systemBackground: resolved.theme.mountBackground
+                systemBackground: resolved.theme.mountBackground,
+                reduceTransparencyEnabled: reduceTransparency
             )
 
-            AxleView(
+            ButterflyButtonViewBuilders.axleLayer(
                 sideLength: resolved.clampedSide,
                 strokeWidth: 2,
                 orientation: style.axleOrientation,
                 color: resolved.theme.axle
             )
 
-            MedallionView(
+            ButterflyButtonViewBuilders.medallionLayer(
                 diameter: resolved.medallionDiameter,
                 strokeWidth: style.medallionStrokeWidth,
                 topColor: resolved.theme.medallionTop,
@@ -230,28 +210,73 @@ public struct ButterflyButton: View {
                 labelColor: resolved.theme.medallionLabel,
                 shape: style.medallionShape,
                 rotationDegrees: rotationDegrees,
-                rotationAxis: resolved.rotationAxis
+                rotationAxis: resolved.rotationAxis,
+                scale: pulseScale
             )
             .scaleEffect(pulseScale)
         }
         .frame(width: resolved.clampedSide, height: resolved.clampedSide)
         .contentShape(Rectangle())
         .gesture(spinGesture(resolved: resolved))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(Text(UIConstants.accessibilityLabel))
-        .accessibilityValue(Text(isOn ? UIConstants.accessibilityStateOn : UIConstants.accessibilityStateOff))
-        .accessibilityHint(Text(UIConstants.accessibilityHint))
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction(named: Text(UIConstants.accessibilityToggleAction)) {
-            performToggleAccessibilityAction(duration: resolved.validDuration)
-        }
-        .accessibilityAction {
-            performToggleAccessibilityAction(duration: resolved.validDuration)
-        }
+        .overlay(
+            Group {
+                if differentiateWithoutColor || showButtonShapes {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(resolved.theme.mountStroke, lineWidth: max(1, resolved.clampedStroke))
+                }
+            }
+        )
+        .modifier(
+            ButterflyButtonAccessibilityModifier(
+                isOn: isOn,
+                accessibilityLabel: UIConstants.accessibilityLabel,
+                accessibilityHint: UIConstants.accessibilityHint,
+                accessibilityToggleActionKey: UIConstants.accessibilityToggleAction,
+                accessibilityStateOn: UIConstants.accessibilityStateOn,
+                accessibilityStateOff: UIConstants.accessibilityStateOff,
+                performToggle: { performToggleAccessibilityAction(duration: resolved.validDuration) }
+            )
+        )
         .frame(minWidth: UIConstants.minimumHitSize, minHeight: UIConstants.minimumHitSize)
+        #if os(iOS) || os(macOS)
+        .onHover { hovering in
+            withAnimation(.easeInOut(duration: 0.12)) {
+                pulseScale = hovering ? 1.03 : 1.0
+            }
+        }
+        #endif
         .allowsHitTesting(isEnabled)
     }
+}
 
+private extension ButterflyButton {
+    private var resolvedValues: ResolvedValues {
+        let clampedSide = ButterflyValidation.clampedSideLength(sideLength)
+        let clampedStroke = ButterflyValidation.clampedMountStrokeWidth(style.mountStrokeWidth, sideLength: clampedSide)
+        let validDuration = ButterflyValidation.validSpinDuration(spinDecelerationDuration)
+
+        let theme = ButterflyTheme.resolve(ThemeInput(
+            colorScheme: colorScheme,
+            contrast: colorSchemeContrast,
+            isEnabled: isEnabled,
+            mountStrokeColor: style.mountStrokeColor,
+            axleColor: style.axleColor,
+            medallionTopColor: style.medallionTopColor,
+            medallionBottomColor: style.medallionBottomColor,
+            medallionEdgeColor: style.medallionEdgeColor,
+            medallionLabelColor: style.medallionLabelColor
+        ))
+
+        return ResolvedValues(
+            clampedSide: clampedSide,
+            clampedStroke: clampedStroke,
+            validDuration: validDuration,
+            theme: theme,
+            medallionDiameter: ButterflyValidation.medallionDiameter(sideLength: clampedSide, strokeWidth: clampedStroke),
+            rotationAxis: ButterflyValidation.rotationAxis(for: style.axleOrientation)
+        )
+    }
+    
     /// Executes the accessibility toggle action when the control is enabled.
     ///
     /// - Parameter duration: Spin duration to use for the toggle action.
@@ -286,7 +311,9 @@ public struct ButterflyButton: View {
         let deltaY = value.predictedEndLocation.y - value.location.y
         return hypot(deltaX, deltaY)
     }
+}
 
+private extension ButterflyButton {
     /// Applies external binding changes using animation policy from the coordinator.
     ///
     /// - Parameter newValue: New external `isOn` value.
@@ -356,7 +383,10 @@ public struct ButterflyButton: View {
             withAnimation(.easeInOut(duration: MotionConstants.reducedMotionPhaseDuration)) {
                 pulseScale = MotionConstants.reducedMotionDownScale
             }
-            withAnimation(.easeInOut(duration: MotionConstants.reducedMotionPhaseDuration).delay(MotionConstants.reducedMotionPhaseDuration)) {
+            withAnimation(
+                .easeInOut(duration: MotionConstants.reducedMotionPhaseDuration)
+                    .delay(MotionConstants.reducedMotionPhaseDuration)
+            ) {
                 pulseScale = 1
             }
             Task { @MainActor in
@@ -407,6 +437,12 @@ public struct ButterflyButton: View {
         )
         rotationDegrees = snapped
         isOn = ButterflyValidation.visibleTopFace(rotationDegrees: snapped)
+        if hapticsEnabled {
+            #if canImport(UIKit)
+            let generator = UIImpactFeedbackGenerator(style: .medium)
+            generator.impactOccurred()
+            #endif
+        }
         onSpinCompleted?(isOn)
         onSpinEnded?(isOn)
     }
@@ -477,34 +513,3 @@ public struct ButterflyButton: View {
     }
 }
 
-/// Preview host showing size and orientation variants of the control.
-private struct ButterflyPreviewHost: View {
-    @State private var isOn = true
-    @State private var second = false
-    @State private var third = true
-
-    var body: some View {
-        VStack(spacing: 20) {
-            ButterflyButton(
-                isOn: $isOn,
-                sideLength: 44,
-                style: ButterflyButtonStyle(axleOrientation: .horizontal)
-            ) { Text("44") }
-            ButterflyButton(
-                isOn: $second,
-                sideLength: 60,
-                style: ButterflyButtonStyle(axleOrientation: .vertical)
-            ) { Text("60") }
-            ButterflyButton(
-                isOn: $third,
-                sideLength: 120,
-                style: ButterflyButtonStyle(axleOrientation: .diagonalLTR)
-            ) { Text("120") }
-        }
-        .padding()
-    }
-}
-
-#Preview("Default") {
-    ButterflyPreviewHost()
-}

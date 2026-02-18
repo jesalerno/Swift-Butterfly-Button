@@ -16,19 +16,47 @@ struct ButterflyButtoniOSDemoApp: App {
 
 /// Interactive iOS demo surface for single-control and grid scenarios.
 struct IOSDemoView: View {
+    private enum Constants {
+        // Layout
+        static let ROOT_HORIZONTAL_PADDING: CGFloat = 16
+        static let ROOT_VERTICAL_PADDING: CGFloat = 20
+        static let SECTION_SPACING: CGFloat = 20
+        static let GRID_SECTION_SPACING: CGFloat = 14
+        static let CARD_CORNER_RADIUS: CGFloat = 16
+        // Grid
+        static let GRID_MIN_DIMENSION: Int = 2
+        static let GRID_MAX_DIMENSION: Int = 12
+        static let GRID_ITEM_MIN: CGFloat = 18
+        static let GRID_ITEM_MAX: CGFloat = 56
+        static let GRID_SPACING: CGFloat = 4
+        static let PERF_DIMENSION_THRESHOLD: Int = 9
+        static let PERF_MAX_SPIN_DURATION: Double = 0.45
+        static let PERF_MAX_SPIN_SPEED: Double = 0.8
+        static let GRID_CELL_SIDE: CGFloat = 40
+        // Defaults
+        static let DEFAULT_SIDE_LENGTH: Double = 64
+        static let DEFAULT_STROKE_WIDTH: Double = 2
+        static let DEFAULT_SPIN_DURATION: Double = 1.8
+        static let DEFAULT_SPIN_SPEED: Double = 1
+        // Event log
+        static let EVENT_LOG_MAX_HEIGHT: CGFloat = 140
+    }
+
     private static let timestampFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
         return formatter
     }()
 
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     @State private var selectedTab = 0
 
     @State private var isOn = true
-    @State private var sideLength: Double = 64
-    @State private var strokeWidth: Double = 2
-    @State private var spinDuration: Double = 1.8
-    @State private var spinSpeed: Double = 1
+    @State private var sideLength: Double = Constants.DEFAULT_SIDE_LENGTH
+    @State private var strokeWidth: Double = Constants.DEFAULT_STROKE_WIDTH
+    @State private var spinDuration: Double = Constants.DEFAULT_SPIN_DURATION
+    @State private var spinSpeed: Double = Constants.DEFAULT_SPIN_SPEED
     @State private var enableFlickPhysics = true
     @State private var hapticsEnabled = true
     @State private var isControlDisabled = false
@@ -59,15 +87,17 @@ struct IOSDemoView: View {
     private var singleControlTab: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: Constants.SECTION_SPACING) {
                     Text("Visual Test Surface")
                         .font(.headline)
+
+                    let styleValue = butterflyStyle(mountStrokeWidth: strokeWidth)
 
                     ButterflyButton(
                         isOn: $isOn,
                         sideLength: sideLength,
                         labelPlacement: placement,
-                        style: butterflyStyle(mountStrokeWidth: strokeWidth),
+                        style: styleValue,
                         spinDecelerationDuration: spinDuration,
                         spinSpeed: spinSpeed,
                         enableFlickPhysics: enableFlickPhysics,
@@ -87,18 +117,25 @@ struct IOSDemoView: View {
                             .font(.headline)
                     }
                     .disabled(isControlDisabled)
-                    .padding(20)
+                    .padding(Constants.ROOT_VERTICAL_PADDING)
                     .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(.regularMaterial)
+                        Group {
+                            if reduceTransparency {
+                                RoundedRectangle(cornerRadius: Constants.CARD_CORNER_RADIUS)
+                                    .fill(.ultraThinMaterial)
+                            } else {
+                                RoundedRectangle(cornerRadius: Constants.CARD_CORNER_RADIUS)
+                                    .fill(.regularMaterial)
+                            }
+                        }
                     )
 
                     controlPanel
 
                     eventLogPanel
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 20)
+                .padding(.horizontal, Constants.ROOT_HORIZONTAL_PADDING)
+                .padding(.vertical, Constants.ROOT_VERTICAL_PADDING)
             }
             .navigationTitle("Butterfly iOS")
         }
@@ -106,7 +143,7 @@ struct IOSDemoView: View {
 
     private var gridControlTab: some View {
         NavigationStack {
-            VStack(spacing: 14) {
+            VStack(spacing: Constants.GRID_SECTION_SPACING) {
                 HStack {
                     Text("Grid Size")
                     Slider(
@@ -114,7 +151,7 @@ struct IOSDemoView: View {
                             get: { Double(gridDimension) },
                             set: { newValue in resizeGrid(to: Int(newValue.rounded())) }
                         ),
-                        in: 2...12,
+                        in: Double(Constants.GRID_MIN_DIMENSION)...Double(Constants.GRID_MAX_DIMENSION),
                         step: 1
                     )
                     Text("\(gridDimension)x\(gridDimension)")
@@ -123,20 +160,29 @@ struct IOSDemoView: View {
 
                 Toggle("Grid Performance Mode", isOn: $gridPerformanceModeEnabled)
 
-                let columns = Array(repeating: GridItem(.flexible(minimum: 18, maximum: 56), spacing: 4), count: gridDimension)
-                let usePerformanceMode = gridPerformanceModeEnabled || gridDimension >= 9
-                let gridSpinDuration = usePerformanceMode ? min(spinDuration, 0.45) : spinDuration
-                let gridSpinSpeed = usePerformanceMode ? min(spinSpeed, 0.8) : spinSpeed
+                let gridItem = GridItem(
+                    .flexible(minimum: Constants.GRID_ITEM_MIN, maximum: Constants.GRID_ITEM_MAX),
+                    spacing: Constants.GRID_SPACING
+                )
+                let columns = Array(repeating: gridItem, count: gridDimension)
+                let usePerformanceMode = gridPerformanceModeEnabled ||
+                    gridDimension >= Constants.PERF_DIMENSION_THRESHOLD
+                let gridSpinDuration = usePerformanceMode
+                    ? min(spinDuration, Constants.PERF_MAX_SPIN_DURATION)
+                    : spinDuration
+                let gridSpinSpeed = usePerformanceMode
+                    ? min(spinSpeed, Constants.PERF_MAX_SPIN_SPEED)
+                    : spinSpeed
                 let gridFlickPhysics = usePerformanceMode ? false : enableFlickPhysics
                 let gridHapticsEnabled = usePerformanceMode ? false : hapticsEnabled
                 let gridStyle = butterflyStyle(mountStrokeWidth: 1.5)
 
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: 4) {
+                    LazyVGrid(columns: columns, spacing: Constants.GRID_SPACING) {
                         ForEach(0..<(gridDimension * gridDimension), id: \.self) { index in
                             ButterflyButton(
                                 isOn: cellBinding(for: index),
-                                sideLength: 40,
+                                sideLength: Constants.GRID_CELL_SIDE,
                                 style: gridStyle,
                                 spinDecelerationDuration: gridSpinDuration,
                                 spinSpeed: gridSpinSpeed,
@@ -146,7 +192,7 @@ struct IOSDemoView: View {
                             .disabled(isControlDisabled)
                         }
                     }
-                    .padding(.vertical, 6)
+                    .padding(.vertical, Constants.GRID_SPACING + 2)
                 }
 
                 Button("Reset Grid To 0") {
@@ -154,7 +200,7 @@ struct IOSDemoView: View {
                 }
                 .buttonStyle(.bordered)
             }
-            .padding(16)
+            .padding(Constants.ROOT_HORIZONTAL_PADDING)
             .navigationTitle("Grid Demo")
         }
     }
@@ -219,10 +265,10 @@ struct IOSDemoView: View {
             .pickerStyle(.segmented)
 
             Button("Reset Defaults") {
-                sideLength = 64
-                strokeWidth = 2
-                spinDuration = 1.8
-                spinSpeed = 1
+                sideLength = Constants.DEFAULT_SIDE_LENGTH
+                strokeWidth = Constants.DEFAULT_STROKE_WIDTH
+                spinDuration = Constants.DEFAULT_SPIN_DURATION
+                spinSpeed = Constants.DEFAULT_SPIN_SPEED
                 enableFlickPhysics = true
                 hapticsEnabled = true
                 isControlDisabled = false
@@ -253,7 +299,7 @@ struct IOSDemoView: View {
                     }
                 }
             }
-            .frame(maxHeight: 140)
+            .frame(maxHeight: Constants.EVENT_LOG_MAX_HEIGHT)
         }
         .padding(14)
         .background(
@@ -284,7 +330,7 @@ struct IOSDemoView: View {
     ///
     /// - Parameter dimension: Requested grid dimension.
     private func resizeGrid(to dimension: Int) {
-        let safeDimension = min(max(dimension, 2), 12)
+        let safeDimension = min(max(dimension, Constants.GRID_MIN_DIMENSION), Constants.GRID_MAX_DIMENSION)
         gridDimension = safeDimension
         gridValues = Array(repeating: 0, count: safeDimension * safeDimension)
     }
@@ -312,6 +358,9 @@ struct IOSDemoView: View {
     private func appendLog(_ message: String) {
         let timestamp = Self.timestampFormatter.string(from: Date())
         eventLog.insert("[\(timestamp)] \(message)", at: 0)
-        if eventLog.count > 30 { eventLog.removeLast(eventLog.count - 30) }
+        if eventLog.count > 30 {
+            eventLog.removeLast(eventLog.count - 30)
+        }
     }
 }
+

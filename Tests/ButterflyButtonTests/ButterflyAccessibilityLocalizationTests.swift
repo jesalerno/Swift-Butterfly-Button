@@ -23,7 +23,11 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
     let pattern = #""([^"]+)"\s*=\s*"([^"]*)";"#
     let regex = try? NSRegularExpression(pattern: pattern)
     let nsRange = NSRange(contents.startIndex..<contents.endIndex, in: contents)
-    regex?.enumerateMatches(in: contents, options: [], range: nsRange) { match, _, _ in
+    regex?.enumerateMatches(
+        in: contents,
+        options: [],
+        range: nsRange
+    ) { match, _, _ in
         guard
             let match,
             let keyRange = Range(match.range(at: 1), in: contents),
@@ -61,12 +65,20 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
 @Test func butterflyButtonUsesLocalizedAccessibilityText() throws {
     let source = try loadFile(relativePath: "Sources/ButterflyButton/ButterflyButton.swift")
 
-    #expect(source.contains("ButterflyButton.accessibility.label"))
-    #expect(source.contains("ButterflyButton.accessibility.hint"))
-    #expect(source.contains("ButterflyButton.accessibility.action.toggle"))
-    #expect(source.contains("ButterflyButton.accessibility.state.on"))
-    #expect(source.contains("ButterflyButton.accessibility.state.off"))
+    let keyLabel = "ButterflyButton.accessibility.label"
+    let keyHint = "ButterflyButton.accessibility.hint"
+    let keyAction = "ButterflyButton.accessibility.action.toggle"
+    let keyOn = "ButterflyButton.accessibility.state.on"
+    let keyOff = "ButterflyButton.accessibility.state.off"
+    let badLabel = ".accessibilityLabel(Text(\"ButterflyButton\"))"
+    let badToggle = ".accessibilityAction(named: Text(\"Toggle\"))"
 
-    #expect(!source.contains(".accessibilityLabel(Text(\"ButterflyButton\"))"))
-    #expect(!source.contains(".accessibilityAction(named: Text(\"Toggle\"))"))
+    #expect(source.contains(keyLabel))
+    #expect(source.contains(keyHint))
+    #expect(source.contains(keyAction))
+    #expect(source.contains(keyOn))
+    #expect(source.contains(keyOff))
+
+    #expect(!source.contains(badLabel))
+    #expect(!source.contains(badToggle))
 }
