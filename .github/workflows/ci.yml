@@ -41,11 +41,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build package for iOS simulator
+      - name: Build iOS demo for iPhone simulator
         run: |
-          xcodebuild -scheme ButterflyButton-Package \
+          xcodebuild -workspace ButterflyButton.xcworkspace \
+            -scheme ButterflyButtoniOSDemo \
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath .build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
             build
 
   ipados-simulator-build:
@@ -54,9 +56,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build package for iPadOS simulator
+      - name: Build iOS demo for iPad simulator
         run: |
-          xcodebuild -scheme ButterflyButton-Package \
+          xcodebuild -workspace ButterflyButton.xcworkspace \
+            -scheme ButterflyButtoniOSDemo \
             -destination 'generic/platform=iOS Simulator,name=iPad' \
             -derivedDataPath .build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
             build

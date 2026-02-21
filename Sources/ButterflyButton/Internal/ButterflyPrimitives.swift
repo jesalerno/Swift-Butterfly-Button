@@ -106,36 +106,28 @@ struct MedallionView: View {
     let rotationDegrees: Double
     let rotationAxis: ButterflyRotationAxis
 
+    /// SwiftUI shape resolved from the `MedallionShape` enum,
+    /// used for background fill, image clipping, and border stroke.
+    private var resolvedShape: AnyShape {
+        shape == .square ? AnyShape(Rectangle()) : AnyShape(Circle())
+    }
+
     var body: some View {
         let visibleTop = ButterflyValidation.visibleTopFace(rotationDegrees: rotationDegrees)
         let faceSource = medallionFaceSource(visibleTop: visibleTop)
 
         ZStack {
-            if shape == .square {
-                Rectangle()
-                    .fill(backgroundColor(visibleTop: visibleTop, faceSource: faceSource))
-            } else {
-                Circle()
-                    .fill(backgroundColor(visibleTop: visibleTop, faceSource: faceSource))
-            }
+            resolvedShape
+                .fill(backgroundColor(visibleTop: visibleTop, faceSource: faceSource))
 
             switch faceSource {
             case let .image(image, isDefaultStone):
-                if shape == .square {
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: diameter, height: diameter)
-                        .scaleEffect(isDefaultStone ? 2.0 : 1.0)
-                        .clipShape(Rectangle())
-                } else {
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: diameter, height: diameter)
-                        .scaleEffect(isDefaultStone ? 2.0 : 1.0)
-                        .clipShape(Circle())
-                }
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: diameter, height: diameter)
+                    .scaleEffect(isDefaultStone ? 2.0 : 1.0)
+                    .clipShape(resolvedShape)
             case .colorFallback:
                 if !visibleTop {
                     Image(systemName: "xmark")
@@ -153,11 +145,8 @@ struct MedallionView: View {
                 .minimumScaleFactor(0.5)
                 .padding(6)
 
-            if shape == .square {
-                Rectangle().stroke(edgeColor, lineWidth: strokeWidth)
-            } else {
-                Circle().stroke(edgeColor, lineWidth: strokeWidth)
-            }
+            resolvedShape
+                .stroke(edgeColor, lineWidth: strokeWidth)
         }
         .frame(width: diameter, height: diameter)
         .rotation3DEffect(
@@ -248,7 +237,7 @@ struct MedallionView: View {
 }
 
 private enum DefaultStoneImageCache {
-    private static let logger = Logger(subsystem: "com.integracode.ButterfylButton", category: "resources")
+    private static let logger = Logger(subsystem: "com.integracode.ButterflyButton", category: "resources")
 
     private static let names = [
         "white-stone-64",
@@ -304,6 +293,8 @@ struct OuterLabelView<Mount: View>: View {
     let mount: Mount
 
     var body: some View {
+        // resolvedPlacement always returns a cardinal placement (.top/.bottom/.leading/.trailing);
+        // the default branch is unreachable but kept for exhaustiveness.
         switch resolvedPlacement {
         case .top:
             VStack(spacing: labelPadding) {
@@ -325,8 +316,8 @@ struct OuterLabelView<Mount: View>: View {
                 mount
                 labelView
             }
-        case .auto:
-            EmptyView()
+        default:
+            mount
         }
     }
 

@@ -2,6 +2,7 @@
 
 import Foundation
 import Testing
+@testable import ButterflyButton
 
 /// Returns a file URL rooted at the package directory.
 private func packageRootURL() -> URL {
@@ -38,11 +39,12 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
     return table
 }
 
+
 /// Verifies required localization keys exist for labels, state, and accessibility text.
 @Test func localizableStringsContainsRequiredAccessibilityKeys() throws {
     let strings = try loadFile(relativePath: "Sources/ButterflyButton/Resources/en.lproj/Localizable.strings")
     let table = parseStringsTable(strings)
-
+    
     let requiredKeys = [
         "ButterflyButton.true",
         "ButterflyButton.false",
@@ -52,19 +54,19 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
         "ButterflyButton.accessibility.state.on",
         "ButterflyButton.accessibility.state.off"
     ]
-
+    
     for key in requiredKeys {
         #expect(table[key] != nil)
         #expect(!(table[key]?.isEmpty ?? true))
     }
-
+    
     #expect(table["ButterflyButton.accessibility.state.on"] != table["ButterflyButton.accessibility.state.off"])
 }
 
 /// Verifies the control implementation references localized accessibility keys.
 @Test func butterflyButtonUsesLocalizedAccessibilityText() throws {
     let source = try loadFile(relativePath: "Sources/ButterflyButton/ButterflyButton.swift")
-
+    
     let keyLabel = "ButterflyButton.accessibility.label"
     let keyHint = "ButterflyButton.accessibility.hint"
     let keyAction = "ButterflyButton.accessibility.action.toggle"
@@ -72,13 +74,13 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
     let keyOff = "ButterflyButton.accessibility.state.off"
     let badLabel = ".accessibilityLabel(Text(\"ButterflyButton\"))"
     let badToggle = ".accessibilityAction(named: Text(\"Toggle\"))"
-
+    
     #expect(source.contains(keyLabel))
     #expect(source.contains(keyHint))
     #expect(source.contains(keyAction))
     #expect(source.contains(keyOn))
     #expect(source.contains(keyOff))
-
+    
     #expect(!source.contains(badLabel))
     #expect(!source.contains(badToggle))
 }

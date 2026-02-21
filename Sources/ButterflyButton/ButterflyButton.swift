@@ -9,12 +9,13 @@ import UIKit
 @MainActor
 /// A flip-style SwiftUI toggle control with gesture-driven animation.
 public struct ButterflyButton: View {
-    private enum UIConstants {
+    @MainActor private enum UIConstants {
         static let defaultSideLength: CGFloat = 60
         static let defaultSpinDuration: TimeInterval = 2.0
         static let minimumHitSize: CGFloat = 44
         static let labelPadding: CGFloat = 2
         static let controlOpacityWhenDisabled: CGFloat = 0.72
+        static let axleStrokeWidth: CGFloat = 2
         static let accessibilityLabel: LocalizedStringKey = "ButterflyButton.accessibility.label"
         static let accessibilityHint: LocalizedStringKey = "ButterflyButton.accessibility.hint"
         static let accessibilityToggleAction: LocalizedStringKey = "ButterflyButton.accessibility.action.toggle"
@@ -72,6 +73,39 @@ public struct ButterflyButton: View {
         let rotationAxis: ButterflyRotationAxis
     }
 
+    // MARK: - Designated initializer
+
+    /// Shared designated initializer used by both public initializers.
+    private init(
+        isOn: Binding<Bool>,
+        sideLength: CGFloat,
+        labelPlacement: LabelPlacement,
+        style: ButterflyButtonStyle,
+        spinDecelerationDuration: TimeInterval,
+        spinSpeed: Double,
+        enableFlickPhysics: Bool,
+        hapticsEnabled: Bool,
+        onSpinBegan: (() -> Void)?,
+        onSpinCompleted: ((_ isOn: Bool) -> Void)?,
+        onSpinEnded: ((_ isOn: Bool) -> Void)?,
+        outerLabel: AnyView?
+    ) {
+        self._isOn = isOn
+        self.sideLength = sideLength
+        self.labelPlacement = labelPlacement
+        self.style = style
+        self.spinDecelerationDuration = spinDecelerationDuration
+        self.spinSpeed = spinSpeed
+        self.enableFlickPhysics = enableFlickPhysics
+        self.hapticsEnabled = hapticsEnabled
+        self.onSpinBegan = onSpinBegan
+        self.onSpinCompleted = onSpinCompleted
+        self.onSpinEnded = onSpinEnded
+        self.outerLabel = outerLabel
+    }
+
+    // MARK: - Public initializers
+
     /// Creates a `ButterflyButton` with default medallion labels.
     ///
     /// - Parameters:
@@ -99,18 +133,20 @@ public struct ButterflyButton: View {
         onSpinCompleted: ((_ isOn: Bool) -> Void)? = nil,
         onSpinEnded: ((_ isOn: Bool) -> Void)? = nil
     ) {
-        self._isOn = isOn
-        self.sideLength = sideLength
-        self.labelPlacement = labelPlacement
-        self.style = style
-        self.spinDecelerationDuration = spinDecelerationDuration
-        self.spinSpeed = spinSpeed
-        self.enableFlickPhysics = enableFlickPhysics
-        self.hapticsEnabled = hapticsEnabled
-        self.onSpinBegan = onSpinBegan
-        self.onSpinCompleted = onSpinCompleted
-        self.onSpinEnded = onSpinEnded
-        self.outerLabel = nil
+        self.init(
+            isOn: isOn,
+            sideLength: sideLength,
+            labelPlacement: labelPlacement,
+            style: style,
+            spinDecelerationDuration: spinDecelerationDuration,
+            spinSpeed: spinSpeed,
+            enableFlickPhysics: enableFlickPhysics,
+            hapticsEnabled: hapticsEnabled,
+            onSpinBegan: onSpinBegan,
+            onSpinCompleted: onSpinCompleted,
+            onSpinEnded: onSpinEnded,
+            outerLabel: nil
+        )
     }
 
     /// Creates a `ButterflyButton` with a custom outer label view.
@@ -142,24 +178,27 @@ public struct ButterflyButton: View {
         onSpinEnded: ((_ isOn: Bool) -> Void)? = nil,
         @ViewBuilder label: () -> some View
     ) {
-        self._isOn = isOn
-        self.sideLength = sideLength
-        self.labelPlacement = labelPlacement
-        self.style = style
-        self.spinDecelerationDuration = spinDecelerationDuration
-        self.spinSpeed = spinSpeed
-        self.enableFlickPhysics = enableFlickPhysics
-        self.hapticsEnabled = hapticsEnabled
-        self.onSpinBegan = onSpinBegan
-        self.onSpinCompleted = onSpinCompleted
-        self.onSpinEnded = onSpinEnded
-        self.outerLabel = AnyView(label())
+        self.init(
+            isOn: isOn,
+            sideLength: sideLength,
+            labelPlacement: labelPlacement,
+            style: style,
+            spinDecelerationDuration: spinDecelerationDuration,
+            spinSpeed: spinSpeed,
+            enableFlickPhysics: enableFlickPhysics,
+            hapticsEnabled: hapticsEnabled,
+            onSpinBegan: onSpinBegan,
+            onSpinCompleted: onSpinCompleted,
+            onSpinEnded: onSpinEnded,
+            outerLabel: AnyView(label())
+        )
     }
+
+    // MARK: - Body
 
     public var body: some View {
         let resolved = resolvedValues
-
-        return OuterLabelView(
+        OuterLabelView(
             sideLength: resolved.clampedSide,
             labelPadding: UIConstants.labelPadding,
             placement: labelPlacement,
@@ -180,7 +219,7 @@ public struct ButterflyButton: View {
     /// - Returns: A view tree for the control surface.
     private func controlSurface(resolved: ResolvedValues) -> some View {
         ZStack {
-            ButterflyButtonViewBuilders.mountLayer(
+            MountView(
                 sideLength: resolved.clampedSide,
                 strokeWidth: resolved.clampedStroke,
                 strokeColor: resolved.theme.mountStroke,
@@ -189,14 +228,14 @@ public struct ButterflyButton: View {
                 reduceTransparencyEnabled: reduceTransparency
             )
 
-            ButterflyButtonViewBuilders.axleLayer(
+            AxleView(
                 sideLength: resolved.clampedSide,
-                strokeWidth: 2,
+                strokeWidth: UIConstants.axleStrokeWidth,
                 orientation: style.axleOrientation,
                 color: resolved.theme.axle
             )
 
-            ButterflyButtonViewBuilders.medallionLayer(
+            MedallionView(
                 diameter: resolved.medallionDiameter,
                 strokeWidth: style.medallionStrokeWidth,
                 topColor: resolved.theme.medallionTop,
@@ -210,8 +249,7 @@ public struct ButterflyButton: View {
                 labelColor: resolved.theme.medallionLabel,
                 shape: style.medallionShape,
                 rotationDegrees: rotationDegrees,
-                rotationAxis: resolved.rotationAxis,
-                scale: pulseScale
+                rotationAxis: resolved.rotationAxis
             )
             .scaleEffect(pulseScale)
         }
@@ -256,15 +294,10 @@ private extension ButterflyButton {
         let validDuration = ButterflyValidation.validSpinDuration(spinDecelerationDuration)
 
         let theme = ButterflyTheme.resolve(ThemeInput(
+            style: style,
             colorScheme: colorScheme,
             contrast: colorSchemeContrast,
-            isEnabled: isEnabled,
-            mountStrokeColor: style.mountStrokeColor,
-            axleColor: style.axleColor,
-            medallionTopColor: style.medallionTopColor,
-            medallionBottomColor: style.medallionBottomColor,
-            medallionEdgeColor: style.medallionEdgeColor,
-            medallionLabelColor: style.medallionLabelColor
+            isEnabled: isEnabled
         ))
 
         return ResolvedValues(
@@ -276,7 +309,7 @@ private extension ButterflyButton {
             rotationAxis: ButterflyValidation.rotationAxis(for: style.axleOrientation)
         )
     }
-    
+
     /// Executes the accessibility toggle action when the control is enabled.
     ///
     /// - Parameter duration: Spin duration to use for the toggle action.

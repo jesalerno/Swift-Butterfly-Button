@@ -28,7 +28,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates side-length clamping for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func clampedSideLength_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func clampedSideLength_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.clampedSideLength(44) == 44)
     #expect(ButterflyValidation.clampedSideLength(120) == 120)
 
@@ -49,7 +50,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates mount-stroke clamping for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func clampedMountStrokeWidth_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func clampedMountStrokeWidth_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.clampedMountStrokeWidth(2, sideLength: 60) == 2)
 
     #expect(ButterflyValidation.clampedMountStrokeWidth(-10, sideLength: 60) == 1)
@@ -71,7 +73,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates spin-duration normalization for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func validSpinDuration_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func validSpinDuration_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.validSpinDuration(1.25) == 1.25)
 
     #expect(ButterflyValidation.validSpinDuration(0) == ButterflyValidation.defaultSpinDuration)
@@ -90,7 +93,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates spin-speed normalization for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func validSpinSpeed_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func validSpinSpeed_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.validSpinSpeed(1.75) == 1.75)
 
     #expect(ButterflyValidation.validSpinSpeed(0) == ButterflyValidation.defaultSpinSpeed)
@@ -109,7 +113,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates medallion-diameter computation for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func medallionDiameter_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func medallionDiameter_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.medallionDiameter(sideLength: 60, strokeWidth: 2) == 50.4)
 
     #expect(ButterflyValidation.medallionDiameter(sideLength: 10, strokeWidth: 999) >= 0)
@@ -129,7 +134,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates direction inference for in-bound, out-of-bound, invalid-edge, and fuzzed inputs.
-@Test func direction_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func direction_hasBoundsInvalidAndFuzzCoverage() {
     let size = CGSize(width: 60, height: 60)
     #expect(ButterflyValidation.direction(for: CGPoint(x: 30, y: 10), in: size) == .topToBottom)
     #expect(ButterflyValidation.direction(for: CGPoint(x: 30, y: 50), in: size) == .bottomToTop)
@@ -148,7 +154,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates spin-degree outputs for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func spinDegrees_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func spinDegrees_hasBoundsInvalidAndFuzzCoverage() {
     let bounded = ButterflyValidation.spinDegrees(duration: 2, spinSpeed: 1, velocity: 100, enableFlickPhysics: true)
     #expect(bounded.isFinite)
     #expect(bounded >= 180)
@@ -183,7 +190,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates fitted-half-turn behavior for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func fittedHalfTurns_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func fittedHalfTurns_hasBoundsInvalidAndFuzzCoverage() {
     #expect(
         ButterflyValidation.fittedHalfTurns(
             from: 1080,
@@ -224,7 +232,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates rotation-state helpers for in-bound, out-of-bound, invalid, and fuzzed inputs.
-@Test func rotationStateHelpers_haveBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func rotationStateHelpers_haveBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.visibleTopFace(rotationDegrees: 0))
     #expect(!ButterflyValidation.visibleTopFace(rotationDegrees: 180))
     #expect(ButterflyValidation.baselineRotationDegrees(for: true) == 0)
@@ -264,7 +273,8 @@ private struct DeterministicRNG {
 }
 
 /// Validates coordinator behavior for in-bound, out-of-bound, expected handling, and fuzzed sequences.
-@Test func interactionCoordinator_hasBoundsInvalidAndFuzzCoverage() {
+@Test(.timeLimit(.minutes(1)))
+func interactionCoordinator_hasBoundsInvalidAndFuzzCoverage() {
     var coordinator = ButterflyInteractionCoordinator()
     coordinator.initialize(isOn: true)
 

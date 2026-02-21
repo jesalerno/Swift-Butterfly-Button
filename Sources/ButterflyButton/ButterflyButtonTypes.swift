@@ -17,7 +17,7 @@ public enum AxleOrientation: Sendable, Equatable {
     case diagonalRTL
 }
 
-public enum MountBackground {
+public enum MountBackground: Sendable {
     case systemAutomatic
     case transparent
     case color(Color)

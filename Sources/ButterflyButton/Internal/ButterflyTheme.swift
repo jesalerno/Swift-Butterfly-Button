@@ -14,6 +14,31 @@ struct ThemeInput {
     let medallionLabelColor: Color?
 }
 
+extension ThemeInput {
+    /// Convenience initializer that extracts color overrides from a `ButterflyButtonStyle`.
+    ///
+    /// Defined in an extension so Swift preserves the auto-generated memberwise initializer.
+    ///
+    /// - Parameters:
+    ///   - style: Style providing optional color overrides.
+    ///   - colorScheme: Current environment color scheme.
+    ///   - contrast: Current environment contrast level.
+    ///   - isEnabled: Whether the control is enabled.
+    init(style: ButterflyButtonStyle, colorScheme: ColorScheme, contrast: ColorSchemeContrast, isEnabled: Bool) {
+        self.init(
+            colorScheme: colorScheme,
+            contrast: contrast,
+            isEnabled: isEnabled,
+            mountStrokeColor: style.mountStrokeColor,
+            axleColor: style.axleColor,
+            medallionTopColor: style.medallionTopColor,
+            medallionBottomColor: style.medallionBottomColor,
+            medallionEdgeColor: style.medallionEdgeColor,
+            medallionLabelColor: style.medallionLabelColor
+        )
+    }
+}
+
 /// Resolved color values used by `ButterflyButton` rendering primitives.
 struct ButterflyTheme {
     let mountStroke: Color
