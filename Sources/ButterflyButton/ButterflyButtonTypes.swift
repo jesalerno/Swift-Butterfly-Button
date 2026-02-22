@@ -135,7 +135,7 @@ public struct ButterflyButtonStyle {
         medallionLabelFont: Font? = nil,
         medallionLabelColor: Color? = nil,
         medallionStrokeWidth: CGFloat = 2,
-        medallionShape: MedallionShape = .circle
+        medallionShape: MedallionShape = .circle,
     ) {
         self.mountStrokeColor = mountStrokeColor
         self.mountStrokeWidth = mountStrokeWidth

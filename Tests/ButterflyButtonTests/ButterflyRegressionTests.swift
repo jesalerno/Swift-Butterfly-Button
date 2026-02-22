@@ -24,10 +24,10 @@ private func loadSource(relativePath: String) throws -> String {
 /// Previously it was misspelled as "ButterfylButton" in ButterflyPrimitives.swift.
 @Test func loggerSubsystem_neverContainsButterfylTypo() throws {
     let primitives = try loadSource(
-        relativePath: "Sources/ButterflyButton/Internal/ButterflyPrimitives.swift"
+        relativePath: "Sources/ButterflyButton/Internal/ButterflyPrimitives.swift",
     )
     let button = try loadSource(
-        relativePath: "Sources/ButterflyButton/ButterflyButton.swift"
+        relativePath: "Sources/ButterflyButton/ButterflyButton.swift",
     )
 
     // The typo "ButterfylButton" (missing second 't') should never appear.
@@ -46,7 +46,7 @@ private func loadSource(relativePath: String) throws -> String {
 /// causing pulseScale² hover scaling.
 @Test func scaleEffectPulseScale_appearsExactlyOnce() throws {
     let source = try loadSource(
-        relativePath: "Sources/ButterflyButton/ButterflyButton.swift"
+        relativePath: "Sources/ButterflyButton/ButterflyButton.swift",
     )
 
     let occurrences = source.components(separatedBy: ".scaleEffect(pulseScale)").count - 1
@@ -58,7 +58,7 @@ private func loadSource(relativePath: String) throws -> String {
 /// Regression: the pass-through ButterflyButtonViewBuilders file must remain deleted.
 @Test func viewBuildersFile_remainsDeleted() {
     let url = packageRootURL().appendingPathComponent(
-        "Sources/ButterflyButton/ButterflyButtonViewBuilders.swift"
+        "Sources/ButterflyButton/ButterflyButtonViewBuilders.swift",
     )
     let exists = FileManager.default.fileExists(atPath: url.path)
     #expect(!exists)
@@ -70,7 +70,7 @@ private func loadSource(relativePath: String) throws -> String {
 /// Placing it inside the struct body suppresses Swift's auto-generated memberwise initializer.
 @Test func themeInputConvenienceInit_isInExtensionNotStructBody() throws {
     let source = try loadSource(
-        relativePath: "Sources/ButterflyButton/Internal/ButterflyTheme.swift"
+        relativePath: "Sources/ButterflyButton/Internal/ButterflyTheme.swift",
     )
 
     // The struct body should NOT contain "init(style:".
@@ -80,9 +80,11 @@ private func loadSource(relativePath: String) throws -> String {
 
     // The pattern "struct ThemeInput" followed by "init(style:" before "extension ThemeInput"
     // would indicate the init is inside the struct body. We check the extension appears first.
-    if let structRange = source.range(of: "struct ThemeInput"),
-       let extensionRange = source.range(of: "extension ThemeInput"),
-       let initStyleRange = source.range(of: "init(style:") {
+    if
+        let structRange = source.range(of: "struct ThemeInput"),
+        let extensionRange = source.range(of: "extension ThemeInput"),
+        let initStyleRange = source.range(of: "init(style:")
+    {
         // The convenience init should appear AFTER the extension keyword, not in the struct body.
         #expect(initStyleRange.lowerBound > extensionRange.lowerBound)
         _ = structRange // suppress unused warning
@@ -95,7 +97,7 @@ private func loadSource(relativePath: String) throws -> String {
 /// not a standalone file-scope enum.
 @Test func externalChangeAction_isNestedInsideCoordinator() throws {
     let source = try loadSource(
-        relativePath: "Sources/ButterflyButton/Internal/ButterflyInteractionEngine.swift"
+        relativePath: "Sources/ButterflyButton/Internal/ButterflyInteractionEngine.swift",
     )
 
     // The old standalone enum name should not appear at file scope.
@@ -110,7 +112,7 @@ private func loadSource(relativePath: String) throws -> String {
 /// Regression: ButterflyButton must NOT use hardcoded accessibility text.
 @Test func accessibilityKeys_areNotHardcoded() throws {
     let source = try loadSource(
-        relativePath: "Sources/ButterflyButton/ButterflyButton.swift"
+        relativePath: "Sources/ButterflyButton/ButterflyButton.swift",
     )
 
     // These hardcoded patterns should never appear.
@@ -128,7 +130,7 @@ private func loadSource(relativePath: String) throws -> String {
 /// Regression: MountBackground must conform to Sendable.
 @Test func mountBackgroundSendableConformance_isPresent() throws {
     let source = try loadSource(
-        relativePath: "Sources/ButterflyButton/ButterflyButtonTypes.swift"
+        relativePath: "Sources/ButterflyButton/ButterflyButtonTypes.swift",
     )
 
     #expect(source.contains("MountBackground: Sendable"))

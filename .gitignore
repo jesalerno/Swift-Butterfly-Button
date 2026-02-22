@@ -12,3 +12,6 @@ xcuserdata/
 
 # Swift Package Manager metadata
 .swiftpm/
+
+# Local lint toggle (touch to lint all files)
+Tools/.lint-all

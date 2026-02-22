@@ -23,28 +23,26 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
     var table: [String: String] = [:]
     let pattern = #""([^"]+)"\s*=\s*"([^"]*)";"#
     let regex = try? NSRegularExpression(pattern: pattern)
-    let nsRange = NSRange(contents.startIndex..<contents.endIndex, in: contents)
+    let nsRange = NSRange(contents.startIndex ..< contents.endIndex, in: contents)
     regex?.enumerateMatches(
         in: contents,
         options: [],
-        range: nsRange
+        range: nsRange,
     ) { match, _, _ in
         guard
             let match,
             let keyRange = Range(match.range(at: 1), in: contents),
-            let valueRange = Range(match.range(at: 2), in: contents)
-        else { return }
+            let valueRange = Range(match.range(at: 2), in: contents) else { return }
         table[String(contents[keyRange])] = String(contents[valueRange])
     }
     return table
 }
 
-
 /// Verifies required localization keys exist for labels, state, and accessibility text.
 @Test func localizableStringsContainsRequiredAccessibilityKeys() throws {
     let strings = try loadFile(relativePath: "Sources/ButterflyButton/Resources/en.lproj/Localizable.strings")
     let table = parseStringsTable(strings)
-    
+
     let requiredKeys = [
         "ButterflyButton.true",
         "ButterflyButton.false",
@@ -52,21 +50,21 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
         "ButterflyButton.accessibility.hint",
         "ButterflyButton.accessibility.action.toggle",
         "ButterflyButton.accessibility.state.on",
-        "ButterflyButton.accessibility.state.off"
+        "ButterflyButton.accessibility.state.off",
     ]
-    
+
     for key in requiredKeys {
         #expect(table[key] != nil)
         #expect(!(table[key]?.isEmpty ?? true))
     }
-    
+
     #expect(table["ButterflyButton.accessibility.state.on"] != table["ButterflyButton.accessibility.state.off"])
 }
 
 /// Verifies the control implementation references localized accessibility keys.
 @Test func butterflyButtonUsesLocalizedAccessibilityText() throws {
     let source = try loadFile(relativePath: "Sources/ButterflyButton/ButterflyButton.swift")
-    
+
     let keyLabel = "ButterflyButton.accessibility.label"
     let keyHint = "ButterflyButton.accessibility.hint"
     let keyAction = "ButterflyButton.accessibility.action.toggle"
@@ -74,13 +72,13 @@ private func parseStringsTable(_ contents: String) -> [String: String] {
     let keyOff = "ButterflyButton.accessibility.state.off"
     let badLabel = ".accessibilityLabel(Text(\"ButterflyButton\"))"
     let badToggle = ".accessibilityAction(named: Text(\"Toggle\"))"
-    
+
     #expect(source.contains(keyLabel))
     #expect(source.contains(keyHint))
     #expect(source.contains(keyAction))
     #expect(source.contains(keyOn))
     #expect(source.contains(keyOff))
-    
+
     #expect(!source.contains(badLabel))
     #expect(!source.contains(badToggle))
 }

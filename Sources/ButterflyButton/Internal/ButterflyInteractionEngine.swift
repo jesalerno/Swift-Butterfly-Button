@@ -8,7 +8,6 @@ import Foundation
 /// external binding changes animate appropriately unless they originated from an internal
 /// toggle.
 struct ButterflyInteractionCoordinator {
-
     /// Describes how to react to an external state change.
     ///
     /// `.none` means no animation should run. `.animate(sign:)` requests an animated rotation
@@ -78,4 +77,3 @@ struct ButterflyInteractionCoordinator {
         return .animate(sign: newValue ? -1.0 : 1.0)
     }
 }
-

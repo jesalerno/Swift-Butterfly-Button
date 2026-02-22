@@ -1,0 +1,123 @@
+
+# --------------------------------------------------------------------
+# SwiftLint Configuration Template
+# --------------------------------------------------------------------
+# Philosophy:
+# - Enforce correctness strongly.
+# - Treat stylistic boundaries as warnings, not errors.
+# - Minimize noise.
+# --------------------------------------------------------------------
+
+# Paths to ignore
+excluded:
+  - Carthage
+  - Pods
+  - .build
+  - DerivedData
+  - Generated
+  - fastlane
+
+# Opt into additional useful rules
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - force_unwrapping
+  - implicit_return
+  - redundant_nil_coalescing
+  - sorted_imports
+  - explicit_init
+  - contains_over_filter_count
+  - first_where
+  - modifier_order
+  - vertical_whitespace_closing_braces
+
+# Disable rules we explicitly reject
+disabled_rules:
+  - todo
+  - trailing_whitespace # handled by formatter
+  - trailing_comma # handled by SwiftFormat (--trailing-commas always)
+  - vertical_parameter_alignment
+
+# --------------------------------------------------------------------
+# Rule Customizations
+# --------------------------------------------------------------------
+
+# 1️⃣ Line Length
+# 120 characters, warning only (no error threshold)
+line_length:
+  warning: 120
+  ignores_urls: true
+  ignores_comments: false
+  ignores_interpolated_strings: false
+
+# 2️⃣ Function Parameter Count
+# 9 parameters = warning only
+function_parameter_count:
+  warning: 9
+  error: 12
+  ignores_default_parameters: false
+
+# 3️⃣ Identifier Name Rules
+identifier_name:
+  min_length:
+    warning: 2
+  max_length:
+    warning: 40
+  allowed_symbols:
+    - _
+  excluded:
+    - x
+    - y
+    - z
+    - i
+    - j
+  validates_start_with_lowercase: warning
+
+# 4️⃣ Cyclomatic Complexity
+# Keep moderate discipline but don’t punish experimentation
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+# 5️⃣ Type Body Length
+type_body_length:
+  warning: 400
+  error: 600
+
+# 6️⃣ File Length
+file_length:
+  warning: 800
+  error: 1200
+
+# 7️⃣ Force Cast
+force_cast:
+  severity: warning
+
+# 8️⃣ Force Try
+force_try:
+  severity: warning
+
+# 9️⃣ Nesting
+nesting:
+  type_level:
+    warning: 3
+  function_level:
+    warning: 5
+
+# 10️⃣ Function Body Length
+function_body_length:
+  warning: 60
+  error: 120
+
+# --------------------------------------------------------------------
+# Analyzer Rules (requires swiftlint analyze)
+# Enable only if you use analysis mode in CI
+# --------------------------------------------------------------------
+analyzer_rules:
+  - unused_import
+  - unused_declaration
+
+# --------------------------------------------------------------------
+# Reporter
+# --------------------------------------------------------------------
+reporter: "xcode"

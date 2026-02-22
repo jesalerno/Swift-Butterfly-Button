@@ -5,6 +5,25 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "SwiftFormat"
+               scriptText = "export SWIFTFORMAT_CONFIG=Tools/.swiftformat&#10;export SRCROOT=$(git -C &quot;$(dirname &quot;$WORKSPACE_PATH&quot;)&quot; rev-parse --show-toplevel)&#10;&quot;$SRCROOT/Tools/xcode-swiftformat.sh&quot;&#10;"
+               shellToInvoke = "/bin/bash">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "BB100000000000000000000B"
+                     BuildableName = "ButterflyButtoniOSDemo.app"
+                     BlueprintName = "ButterflyButtoniOSDemo"
+                     ReferencedContainer = "container:Examples/ButterflyButtoniOSDemo/ButterflyButtoniOSDemo.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -27,6 +46,8 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"

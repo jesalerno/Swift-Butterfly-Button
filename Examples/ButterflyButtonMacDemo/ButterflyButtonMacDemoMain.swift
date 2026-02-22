@@ -1,16 +1,16 @@
 // Copyright 2026 John Salerno.
 
+import ButterflyButton
 import Foundation
 import SwiftUI
-import ButterflyButton
 #if canImport(AppKit)
-import AppKit
+    import AppKit
 #endif
 
 // MARK: - App entry point
 
-@main
 /// Entry point for the macOS ButterflyButton demo app.
+@main
 struct ButterflyButtonMacDemoApp: App {
     /// Window sizing constants for the macOS demo.
     private enum Constants {
@@ -31,17 +31,18 @@ private extension Color {
     /// Cross-platform window background color used as an opaque fallback.
     static var platformWindowBackground: Color {
         #if canImport(AppKit)
-        Color(NSColor.windowBackgroundColor)
+            Color(NSColor.windowBackgroundColor)
         #else
-        Color(UIColor.systemBackground)
+            Color(UIColor.systemBackground)
         #endif
     }
+
     /// Cross-platform control background color used for panels and matrix rows.
     static var platformControlBackground: Color {
         #if canImport(AppKit)
-        Color(NSColor.controlBackgroundColor)
+            Color(NSColor.controlBackgroundColor)
         #else
-        Color(UIColor.secondarySystemBackground)
+            Color(UIColor.secondarySystemBackground)
         #endif
     }
 }
@@ -66,14 +67,15 @@ private struct AdaptiveCardModifier: ViewModifier {
                     } else {
                         RoundedRectangle(cornerRadius: cornerRadius).fill(AnyShapeStyle(material))
                     }
-                }
+                },
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
 private extension View {
-    /// Applies a rounded-rectangle background using a system material or an opaque fallback when Reduce Transparency is enabled.
+    /// Applies a rounded-rectangle background using a system material or an opaque fallback when Reduce Transparency is
+    /// enabled.
     ///
     /// - Parameters:
     ///   - cornerRadius: The corner radius for the rounded rectangle.
@@ -89,7 +91,6 @@ private extension View {
 
 /// Interactive macOS demo showcasing a single control panel and a grid performance surface.
 struct DemoView: View {
-
     /// Layout, grid geometry, performance caps, and defaults for the macOS demo UI.
     private enum Constants {
         // Layout and spacing
@@ -119,7 +120,7 @@ struct DemoView: View {
         static let EVENT_ROW_CORNER_RADIUS: CGFloat = 4
         static let EVENT_SCROLL_MAX_HEIGHT: CGFloat = 220
         static let EVENT_LOG_MAX_LINES: Int = 30
-        // Slider value labels (unified width covers all formatted values)
+        /// Slider value labels (unified width covers all formatted values)
         static let SLIDER_VALUE_WIDTH: CGFloat = 64
         // Defaults
         static let DEFAULT_SIDE_LENGTH: Double = 60
@@ -157,7 +158,10 @@ struct DemoView: View {
     @State private var eventLog: [String] = []
 
     @State private var gridDimension: Int = Constants.DEFAULT_GRID_DIMENSION
-    @State private var gridValues: [Int] = Array(repeating: 0, count: Constants.DEFAULT_GRID_DIMENSION * Constants.DEFAULT_GRID_DIMENSION)
+    @State private var gridValues: [Int] = Array(
+        repeating: 0,
+        count: Constants.DEFAULT_GRID_DIMENSION * Constants.DEFAULT_GRID_DIMENSION,
+    )
     @State private var gridPerformanceModeEnabled: Bool = true
 
     /// Builds the tabbed demo surface and initializes the grid on appear.
@@ -181,7 +185,6 @@ struct DemoView: View {
 // MARK: - Views
 
 private extension DemoView {
-
     var singleControlTab: some View {
         HStack(spacing: Constants.SECTION_SPACING) {
             controlPanel
@@ -211,18 +214,19 @@ private extension DemoView {
                     onSpinEnded: { newValue in
                         isOn = newValue
                         appendLog("spin ended isOn=\(newValue)")
-                    }
-                ) {
-                    Text("Butterfly")
-                        .font(.headline)
-                }
+                    },
+                    label: {
+                        Text("Butterfly")
+                            .font(.headline)
+                    },
+                )
                 .tint(.white)
                 .disabled(isControlDisabled)
                 .padding(Constants.OUTER_PADDING)
                 .adaptiveCard(
                     cornerRadius: Constants.CARD_CORNER_RADIUS,
                     solid: Color.platformWindowBackground,
-                    material: .regularMaterial
+                    material: .regularMaterial,
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -241,10 +245,10 @@ private extension DemoView {
                     Slider(
                         value: Binding(
                             get: { Double(gridDimension) },
-                            set: { newValue in resizeGrid(to: Int(newValue.rounded())) }
+                            set: { newValue in resizeGrid(to: Int(newValue.rounded())) },
                         ),
-                        in: Double(Constants.GRID_MIN_DIMENSION)...Double(Constants.GRID_MAX_DIMENSION),
-                        step: 1
+                        in: Double(Constants.GRID_MIN_DIMENSION) ... Double(Constants.GRID_MAX_DIMENSION),
+                        step: 1,
                     ) { editing in
                         if !editing { appendLog("gridSize → \(gridDimension)x\(gridDimension)") }
                     }
@@ -265,18 +269,18 @@ private extension DemoView {
                     .font(.headline)
                 ScrollView {
                     VStack(alignment: .leading, spacing: Constants.EVENT_ROW_SPACING) {
-                        ForEach(0..<gridDimension, id: \.self) { row in
+                        ForEach(0 ..< gridDimension, id: \.self) { row in
                             let start = row * gridDimension
                             let end = start + gridDimension
                             if end <= gridValues.count {
-                                let rowString = gridValues[start..<end].map(String.init).joined(separator: " ")
+                                let rowString = gridValues[start ..< end].map(String.init).joined(separator: " ")
                                 Text(rowString)
                                     .font(.caption2.monospacedDigit())
                                     .padding(.horizontal, 4)
                                     .padding(.vertical, 2)
                                     .background(
                                         RoundedRectangle(cornerRadius: Constants.EVENT_ROW_CORNER_RADIUS)
-                                            .fill(Color.platformControlBackground)
+                                            .fill(Color.platformControlBackground),
                                     )
                             }
                         }
@@ -296,18 +300,23 @@ private extension DemoView {
             GeometryReader { geometry in
                 let spacing: CGFloat = Constants.GRID_SPACING
                 let availableWidth = max(geometry.size.width - CGFloat(gridDimension - 1) * spacing, 100)
-                let cellSide = max(min(availableWidth / CGFloat(gridDimension), Constants.GRID_CELL_MAX), Constants.GRID_CELL_MIN)
+                let cellSide = max(
+                    min(availableWidth / CGFloat(gridDimension), Constants.GRID_CELL_MAX),
+                    Constants.GRID_CELL_MIN,
+                )
                 let columns = Array(repeating: GridItem(.fixed(cellSide), spacing: spacing), count: gridDimension)
                 let gridStyle = butterflyStyle(mountStrokeWidth: max(1, cellSide * 0.05))
-                let usePerformanceMode = gridPerformanceModeEnabled || gridDimension >= Constants.PERF_DIMENSION_THRESHOLD
-                let gridSpinDuration = usePerformanceMode ? min(spinDuration, Constants.PERF_MAX_SPIN_DURATION) : spinDuration
+                let usePerformanceMode = gridPerformanceModeEnabled || gridDimension >= Constants
+                    .PERF_DIMENSION_THRESHOLD
+                let gridSpinDuration = usePerformanceMode ? min(spinDuration, Constants.PERF_MAX_SPIN_DURATION) :
+                    spinDuration
                 let gridSpinSpeed = usePerformanceMode ? min(spinSpeed, Constants.PERF_MAX_SPIN_SPEED) : spinSpeed
                 let gridFlickPhysics = usePerformanceMode ? false : enableFlickPhysics
                 let gridHapticsEnabled = usePerformanceMode ? false : hapticsEnabled
 
                 ScrollView([.vertical, .horizontal]) {
                     LazyVGrid(columns: columns, spacing: spacing) {
-                        ForEach(0..<(gridDimension * gridDimension), id: \.self) { index in
+                        ForEach(0 ..< (gridDimension * gridDimension), id: \.self) { index in
                             ButterflyButton(
                                 isOn: cellBinding(for: index),
                                 sideLength: cellSide,
@@ -318,7 +327,7 @@ private extension DemoView {
                                 hapticsEnabled: gridHapticsEnabled,
                                 onSpinEnded: { newValue in
                                     appendLog("grid[\(index)] isOn=\(newValue)")
-                                }
+                                },
                             )
                             .disabled(isControlDisabled)
                         }
@@ -327,7 +336,7 @@ private extension DemoView {
                     .adaptiveCard(
                         cornerRadius: Constants.GRID_CARD_CORNER_RADIUS,
                         solid: Color.platformControlBackground,
-                        material: .thinMaterial
+                        material: .thinMaterial,
                     )
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -342,6 +351,7 @@ private extension DemoView {
                 .font(.title2.weight(.semibold))
 
             // MARK: State controls
+
             Toggle("On / Off", isOn: $isOn)
                 .disabled(isControlDisabled)
                 .onChange(of: isOn) { _, new in appendLog("isOn → \(new)") }
@@ -353,9 +363,10 @@ private extension DemoView {
                 .onChange(of: isControlDisabled) { _, new in appendLog("disabled → \(new)") }
 
             // MARK: Dimension controls
+
             HStack {
                 Text("Size")
-                Slider(value: $sideLength, in: 44...140, step: 1) { editing in
+                Slider(value: $sideLength, in: 44 ... 140, step: 1) { editing in
                     if !editing { appendLog("size → \(Int(sideLength))") }
                 }
                 Text("\(Int(sideLength))")
@@ -365,7 +376,7 @@ private extension DemoView {
 
             HStack {
                 Text("Mount Stroke")
-                Slider(value: $strokeWidth, in: 1...14, step: 0.5) { editing in
+                Slider(value: $strokeWidth, in: 1 ... 14, step: 0.5) { editing in
                     if !editing { appendLog("stroke → \(String(format: "%.1f", strokeWidth))") }
                 }
                 Text(String(format: "%.1f", strokeWidth))
@@ -375,7 +386,7 @@ private extension DemoView {
 
             HStack {
                 Text("Spin Duration")
-                Slider(value: $spinDuration, in: 0.2...4.0, step: 0.1) { editing in
+                Slider(value: $spinDuration, in: 0.2 ... 4.0, step: 0.1) { editing in
                     if !editing { appendLog("duration → \(String(format: "%.1fs", spinDuration))") }
                 }
                 Text(String(format: "%.1fs", spinDuration))
@@ -385,7 +396,7 @@ private extension DemoView {
 
             HStack {
                 Text("Spin Speed")
-                Slider(value: $spinSpeed, in: 0.25...3.0, step: 0.05) { editing in
+                Slider(value: $spinSpeed, in: 0.25 ... 3.0, step: 0.05) { editing in
                     if !editing { appendLog("speed → \(String(format: "%.2fx", spinSpeed))") }
                 }
                 Text(String(format: "%.2fx", spinSpeed))
@@ -394,6 +405,7 @@ private extension DemoView {
             }
 
             // MARK: Style controls
+
             Picker("Axle Orientation", selection: $orientation) {
                 Text("Horizontal").tag(AxleOrientation.horizontal)
                 Text("Vertical").tag(AxleOrientation.vertical)
@@ -418,6 +430,7 @@ private extension DemoView {
             .onChange(of: medallionShape) { _, new in appendLog("shape → \(new)") }
 
             // MARK: Reset
+
             Button("Reset Defaults") {
                 sideLength = Constants.DEFAULT_SIDE_LENGTH
                 strokeWidth = Constants.DEFAULT_STROKE_WIDTH
@@ -435,6 +448,7 @@ private extension DemoView {
             Spacer(minLength: 10)
 
             // MARK: Event log
+
             Text("Event Log")
                 .font(.headline)
             ScrollView {
@@ -461,7 +475,6 @@ private extension DemoView {
 // MARK: - Helpers
 
 private extension DemoView {
-
     /// Writes a message to the system console via NSLog.
     ///
     /// - Parameter message: The message to log.
@@ -478,12 +491,12 @@ private extension DemoView {
     @discardableResult
     func assertOrClamp(_ condition: @autoclosure () -> Bool, _ message: @autoclosure () -> String) -> Bool {
         #if DEBUG
-        precondition(condition(), message())
-        return condition()
+            precondition(condition(), message())
+            return condition()
         #else
-        let ok = condition()
-        if !ok { demoLog("ASSERTION WOULD FAIL: \(message())") }
-        return ok
+            let ok = condition()
+            if !ok { demoLog("ASSERTION WOULD FAIL: \(message())") }
+            return ok
         #endif
     }
 
@@ -504,7 +517,7 @@ private extension DemoView {
             medallionTopLabel: "",
             medallionBottomLabel: "",
             medallionLabelColor: .clear,
-            medallionShape: medallionShape
+            medallionShape: medallionShape,
         )
     }
 
@@ -525,15 +538,21 @@ private extension DemoView {
     func cellBinding(for index: Int) -> Binding<Bool> {
         Binding(
             get: {
-                let ok = assertOrClamp(gridValues.indices.contains(index), "Grid index out of bounds (get): \(index) for dim=\(gridDimension)")
+                let ok = assertOrClamp(
+                    gridValues.indices.contains(index),
+                    "Grid index out of bounds (get): \(index) for dim=\(gridDimension)",
+                )
                 guard ok else { return false }
                 return gridValues[index] == 1
             },
             set: { newValue in
-                let ok = assertOrClamp(gridValues.indices.contains(index), "Grid index out of bounds (set): \(index) for dim=\(gridDimension)")
+                let ok = assertOrClamp(
+                    gridValues.indices.contains(index),
+                    "Grid index out of bounds (set): \(index) for dim=\(gridDimension)",
+                )
                 guard ok else { return }
                 gridValues[index] = newValue ? 1 : 0
-            }
+            },
         )
     }
 
@@ -549,4 +568,3 @@ private extension DemoView {
         }
     }
 }
-

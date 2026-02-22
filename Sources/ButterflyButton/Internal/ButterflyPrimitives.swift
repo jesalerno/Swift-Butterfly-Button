@@ -1,17 +1,17 @@
 // Copyright 2026 John Salerno.
 
-import SwiftUI
 import OSLog
+import SwiftUI
 #if canImport(AppKit)
-import AppKit
+    import AppKit
 #elseif canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
 #if canImport(AppKit)
-private typealias PlatformImage = NSImage
+    private typealias PlatformImage = NSImage
 #elseif canImport(UIKit)
-private typealias PlatformImage = UIImage
+    private typealias PlatformImage = UIImage
 #endif
 
 /// Renders the square mount behind the medallion, including background and border.
@@ -182,7 +182,7 @@ struct MedallionView: View {
         .rotation3DEffect(
             .degrees(rotationDegrees),
             axis: (x: rotationAxis.x, y: rotationAxis.y, z: rotationAxis.z),
-            perspective: 0.75
+            perspective: 0.75,
         )
     }
 
@@ -214,9 +214,9 @@ struct MedallionView: View {
     private func backgroundColor(visibleTop: Bool, faceSource: FaceSource) -> Color {
         switch faceSource {
         case .image:
-            return visibleTop ? topColor : bottomColor
+            visibleTop ? topColor : bottomColor
         case .colorFallback:
-            return visibleTop ? .orange : .purple
+            visibleTop ? .orange : .purple
         }
     }
 
@@ -227,39 +227,38 @@ struct MedallionView: View {
     ///   - shape: Active medallion shape.
     /// - Returns: Default face image when available.
     private func defaultStoneImage(visibleTop: Bool, shape: MedallionShape) -> Image? {
-        let candidateNames: [String]
-        switch shape {
+        let candidateNames: [String] = switch shape {
         case .square:
-            candidateNames = visibleTop
+            visibleTop
                 ? [
                     "square-white-stone-64",
-                    "square-white-stone-128"
-                  ]
+                    "square-white-stone-128",
+                ]
                 : [
                     "square-black-stone-64",
-                    "square-black-stone-128"
-                  ]
+                    "square-black-stone-128",
+                ]
         case .circle:
-            candidateNames = visibleTop
+            visibleTop
                 ? [
                     "white-stone-64",
-                    "white-stone-128"
-                  ]
+                    "white-stone-128",
+                ]
                 : [
                     "black-stone-64",
-                    "black-stone-128"
-                  ]
+                    "black-stone-128",
+                ]
         }
 
         for name in candidateNames {
             #if canImport(AppKit)
-            if let image = DefaultStoneImageCache.image(named: name) {
-                return Image(nsImage: image)
-            }
+                if let image = DefaultStoneImageCache.image(named: name) {
+                    return Image(nsImage: image)
+                }
             #elseif canImport(UIKit)
-            if let image = DefaultStoneImageCache.image(named: name) {
-                return Image(uiImage: image)
-            }
+                if let image = DefaultStoneImageCache.image(named: name) {
+                    return Image(uiImage: image)
+                }
             #endif
         }
         return nil
@@ -280,7 +279,7 @@ private enum DefaultStoneImageCache {
         "square-white-stone-64",
         "square-white-stone-128",
         "square-black-stone-64",
-        "square-black-stone-128"
+        "square-black-stone-128",
     ]
 
     static let loaded: [String: PlatformImage] = {
@@ -291,17 +290,17 @@ private enum DefaultStoneImageCache {
                 continue
             }
             #if canImport(AppKit)
-            if let image = NSImage(contentsOf: url) {
-                images[name] = image
-            } else {
-                logger.error("Failed to load bundled resource at path: \(url.path, privacy: .public)")
-            }
+                if let image = NSImage(contentsOf: url) {
+                    images[name] = image
+                } else {
+                    logger.error("Failed to load bundled resource at path: \(url.path, privacy: .public)")
+                }
             #elseif canImport(UIKit)
-            if let image = UIImage(contentsOfFile: url.path) {
-                images[name] = image
-            } else {
-                logger.error("Failed to load bundled resource at path: \(url.path, privacy: .public)")
-            }
+                if let image = UIImage(contentsOfFile: url.path) {
+                    images[name] = image
+                } else {
+                    logger.error("Failed to load bundled resource at path: \(url.path, privacy: .public)")
+                }
             #endif
         }
         return images
@@ -376,4 +375,3 @@ struct OuterLabelView<Mount: View>: View {
         }
     }
 }
-

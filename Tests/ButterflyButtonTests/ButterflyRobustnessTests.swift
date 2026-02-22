@@ -10,11 +10,11 @@ private struct DeterministicRNG {
     private var state: UInt64
 
     init(seed: UInt64) {
-        self.state = seed
+        state = seed
     }
 
     mutating func nextUInt64() -> UInt64 {
-        state = state &* 6364136223846793005 &+ 1442695040888963407
+        state = state &* 6_364_136_223_846_793_005 &+ 1_442_695_040_888_963_407
         return state
     }
 
@@ -41,8 +41,8 @@ func clampedSideLength_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.clampedSideLength(-.infinity) == 44)
 
     var rng = DeterministicRNG(seed: 0xA11CE)
-    for _ in 0..<500 {
-        let sample = CGFloat(rng.nextDouble(in: -10_000...10_000))
+    for _ in 0 ..< 500 {
+        let sample = CGFloat(rng.nextDouble(in: -10000 ... 10000))
         let result = ButterflyValidation.clampedSideLength(sample)
         #expect(result >= ButterflyValidation.minimumSideLength)
         #expect(result.isFinite)
@@ -61,9 +61,9 @@ func clampedMountStrokeWidth_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.clampedMountStrokeWidth(.infinity, sideLength: 60) == 2)
 
     var rng = DeterministicRNG(seed: 0xBADC0DE)
-    for _ in 0..<500 {
-        let side = CGFloat(rng.nextDouble(in: -500...500))
-        let width = CGFloat(rng.nextDouble(in: -500...500))
+    for _ in 0 ..< 500 {
+        let side = CGFloat(rng.nextDouble(in: -500 ... 500))
+        let width = CGFloat(rng.nextDouble(in: -500 ... 500))
         let result = ButterflyValidation.clampedMountStrokeWidth(width, sideLength: side)
         let maxStroke = ButterflyValidation.clampedSideLength(side) * 0.10
         #expect(result >= ButterflyValidation.minimumStrokeWidth)
@@ -84,8 +84,8 @@ func validSpinDuration_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.validSpinDuration(.infinity) == ButterflyValidation.defaultSpinDuration)
 
     var rng = DeterministicRNG(seed: 0xD00D)
-    for _ in 0..<500 {
-        let value = rng.nextDouble(in: -50...50)
+    for _ in 0 ..< 500 {
+        let value = rng.nextDouble(in: -50 ... 50)
         let result = ButterflyValidation.validSpinDuration(value)
         #expect(result > 0)
         #expect(result.isFinite)
@@ -103,9 +103,9 @@ func validSpinSpeed_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.validSpinSpeed(.nan) == ButterflyValidation.defaultSpinSpeed)
     #expect(ButterflyValidation.validSpinSpeed(.infinity) == ButterflyValidation.defaultSpinSpeed)
 
-    var rng = DeterministicRNG(seed: 0x12345678)
-    for _ in 0..<500 {
-        let value = rng.nextDouble(in: -50...50)
+    var rng = DeterministicRNG(seed: 0x1234_5678)
+    for _ in 0 ..< 500 {
+        let value = rng.nextDouble(in: -50 ... 50)
         let result = ButterflyValidation.validSpinSpeed(value)
         #expect(result > 0)
         #expect(result.isFinite)
@@ -123,10 +123,10 @@ func medallionDiameter_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.medallionDiameter(sideLength: .nan, strokeWidth: 2).isFinite)
     #expect(ButterflyValidation.medallionDiameter(sideLength: 60, strokeWidth: .nan).isFinite)
 
-    var rng = DeterministicRNG(seed: 0xCAFEBABE)
-    for _ in 0..<500 {
-        let side = CGFloat(rng.nextDouble(in: -500...1_000))
-        let stroke = CGFloat(rng.nextDouble(in: -500...500))
+    var rng = DeterministicRNG(seed: 0xCAFE_BABE)
+    for _ in 0 ..< 500 {
+        let side = CGFloat(rng.nextDouble(in: -500 ... 1000))
+        let stroke = CGFloat(rng.nextDouble(in: -500 ... 500))
         let result = ButterflyValidation.medallionDiameter(sideLength: side, strokeWidth: stroke)
         #expect(result >= 0)
         #expect(result.isFinite)
@@ -146,8 +146,8 @@ func direction_hasBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.direction(for: CGPoint(x: CGFloat.nan, y: CGFloat.nan), in: size) == .bottomToTop)
 
     var rng = DeterministicRNG(seed: 0x515151)
-    for _ in 0..<500 {
-        let y = CGFloat(rng.nextDouble(in: -1_000...1_000))
+    for _ in 0 ..< 500 {
+        let y = CGFloat(rng.nextDouble(in: -1000 ... 1000))
         let expected: SpinDirection = y <= (size.height / 2) ? .topToBottom : .bottomToTop
         #expect(ButterflyValidation.direction(for: CGPoint(x: 0, y: y), in: size) == expected)
     }
@@ -160,11 +160,21 @@ func spinDegrees_hasBoundsInvalidAndFuzzCoverage() {
     #expect(bounded.isFinite)
     #expect(bounded >= 180)
 
-    let outBound = ButterflyValidation.spinDegrees(duration: -99, spinSpeed: -99, velocity: -99, enableFlickPhysics: true)
+    let outBound = ButterflyValidation.spinDegrees(
+        duration: -99,
+        spinSpeed: -99,
+        velocity: -99,
+        enableFlickPhysics: true,
+    )
     #expect(outBound >= 180)
     #expect(outBound.isFinite)
 
-    let invalid = ButterflyValidation.spinDegrees(duration: .nan, spinSpeed: .infinity, velocity: .nan, enableFlickPhysics: true)
+    let invalid = ButterflyValidation.spinDegrees(
+        duration: .nan,
+        spinSpeed: .infinity,
+        velocity: .nan,
+        enableFlickPhysics: true,
+    )
     #expect(invalid >= 180)
     #expect(invalid.isFinite)
 
@@ -173,15 +183,15 @@ func spinDegrees_hasBoundsInvalidAndFuzzCoverage() {
     #expect(overload.isFinite)
 
     var rng = DeterministicRNG(seed: 0x9999)
-    for _ in 0..<500 {
-        let duration = rng.nextDouble(in: -10...10)
-        let speed = rng.nextDouble(in: -5...5)
-        let velocity = CGFloat(rng.nextDouble(in: -2_000...2_000))
+    for _ in 0 ..< 500 {
+        let duration = rng.nextDouble(in: -10 ... 10)
+        let speed = rng.nextDouble(in: -5 ... 5)
+        let velocity = CGFloat(rng.nextDouble(in: -2000 ... 2000))
         let result = ButterflyValidation.spinDegrees(
             duration: duration,
             spinSpeed: speed,
             velocity: velocity,
-            enableFlickPhysics: true
+            enableFlickPhysics: true,
         )
         #expect(result.isFinite)
         #expect(result >= 180)
@@ -196,14 +206,14 @@ func fittedHalfTurns_hasBoundsInvalidAndFuzzCoverage() {
         ButterflyValidation.fittedHalfTurns(
             from: 1080,
             duration: 1.0,
-            minimumSegmentDuration: 0.05
-        ) > 0
+            minimumSegmentDuration: 0.05,
+        ) > 0,
     )
 
     let outBound = ButterflyValidation.fittedHalfTurns(
-        from: -1_000,
+        from: -1000,
         duration: -1.0,
-        minimumSegmentDuration: -0.1
+        minimumSegmentDuration: -0.1,
     )
     #expect(outBound >= 1)
     #expect(outBound % 2 == 1)
@@ -211,20 +221,20 @@ func fittedHalfTurns_hasBoundsInvalidAndFuzzCoverage() {
     let invalid = ButterflyValidation.fittedHalfTurns(
         from: .nan,
         duration: .nan,
-        minimumSegmentDuration: .nan
+        minimumSegmentDuration: .nan,
     )
     #expect(invalid >= 1)
     #expect(invalid % 2 == 1)
 
-    var rng = DeterministicRNG(seed: 0xDEADBEEF)
-    for _ in 0..<500 {
-        let degrees = rng.nextDouble(in: -100_000...100_000)
-        let duration = rng.nextDouble(in: -10...10)
-        let minimum = rng.nextDouble(in: -1...1)
+    var rng = DeterministicRNG(seed: 0xDEAD_BEEF)
+    for _ in 0 ..< 500 {
+        let degrees = rng.nextDouble(in: -100_000 ... 100_000)
+        let duration = rng.nextDouble(in: -10 ... 10)
+        let minimum = rng.nextDouble(in: -1 ... 1)
         let result = ButterflyValidation.fittedHalfTurns(
             from: degrees,
             duration: duration,
-            minimumSegmentDuration: minimum
+            minimumSegmentDuration: minimum,
         )
         #expect(result >= 1)
         #expect(result % 2 == 1)
@@ -247,8 +257,8 @@ func rotationStateHelpers_haveBoundsInvalidAndFuzzCoverage() {
     #expect(ButterflyValidation.snappedStopRotationDegrees(current: .nan, isOn: true) == 0)
 
     var rng = DeterministicRNG(seed: 0xABCD)
-    for _ in 0..<500 {
-        let current = rng.nextDouble(in: -100_000...100_000)
+    for _ in 0 ..< 500 {
+        let current = rng.nextDouble(in: -100_000 ... 100_000)
         let onSnap = ButterflyValidation.snappedStopRotationDegrees(current: current, isOn: true)
         let offSnap = ButterflyValidation.snappedStopRotationDegrees(current: current, isOn: false)
         #expect(ButterflyValidation.visibleTopFace(rotationDegrees: onSnap))
@@ -292,7 +302,7 @@ func interactionCoordinator_hasBoundsInvalidAndFuzzCoverage() {
 
     var rng = DeterministicRNG(seed: 0xF00D)
     coordinator.initialize(isOn: false)
-    for _ in 0..<500 {
+    for _ in 0 ..< 500 {
         let enabled = (rng.nextUInt64() & 1) == 1
         let newValue = (rng.nextUInt64() & 1) == 1
         let action = coordinator.actionForExternalStateChange(newValue: newValue, isEnabled: enabled)
@@ -301,4 +311,3 @@ func interactionCoordinator_hasBoundsInvalidAndFuzzCoverage() {
         }
     }
 }
-

@@ -18,12 +18,12 @@ private struct ButterflyPreviewMatrix: View {
         let previewStyle = ButterflyButtonStyle(
             axleOrientation: .diagonalRTL,
             medallionTopImage: Image(systemName: "sun.max.fill"),
-            medallionBottomImage: Image(systemName: "moon.fill")
+            medallionBottomImage: Image(systemName: "moon.fill"),
         )
         VStack(spacing: Constants.PREVIEW_SECTION_SPACING) {
             ButterflyButton(
                 isOn: $isFirstOn,
-                style: previewStyle
+                style: previewStyle,
             ) {
                 Text("Matrix")
             }
@@ -31,7 +31,7 @@ private struct ButterflyPreviewMatrix: View {
             ButterflyButton(
                 isOn: $isSecondOn,
                 labelPlacement: .auto,
-                spinDecelerationDuration: Constants.PREVIEW_SPIN_DURATION
+                spinDecelerationDuration: Constants.PREVIEW_SPIN_DURATION,
             ) {
                 Text("RTL/Type")
             }
@@ -66,19 +66,19 @@ private struct ButterflyPreviewHost: View {
                 isOn: $isOn,
                 sideLength: 44,
                 style: ButterflyButtonStyle(axleOrientation: .horizontal),
-                label: { Text("44") }
+                label: { Text("44") },
             )
             ButterflyButton(
                 isOn: $second,
                 sideLength: 60,
                 style: ButterflyButtonStyle(axleOrientation: .vertical),
-                label: { Text("60") }
+                label: { Text("60") },
             )
             ButterflyButton(
                 isOn: $third,
                 sideLength: 120,
                 style: ButterflyButtonStyle(axleOrientation: .diagonalLTR),
-                label: { Text("120") }
+                label: { Text("120") },
             )
         }
         .padding()
@@ -88,4 +88,3 @@ private struct ButterflyPreviewHost: View {
 #Preview("Default") {
     ButterflyPreviewHost()
 }
-

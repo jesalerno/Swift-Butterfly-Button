@@ -66,7 +66,7 @@ import Testing
         medallionLabelFont: .title,
         medallionLabelColor: .purple,
         medallionStrokeWidth: 3,
-        medallionShape: .square
+        medallionShape: .square,
     )
 
     #expect(style.mountStrokeColor == .red)

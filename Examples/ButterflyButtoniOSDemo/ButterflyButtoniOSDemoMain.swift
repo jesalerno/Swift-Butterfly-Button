@@ -3,22 +3,27 @@
 import Foundation
 import SwiftUI
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 import ButterflyButton
 
 // MARK: - App entry point
 
-@main
 /// Entry point for the iOS ButterflyButton demo app.
 ///
 /// Installs a simple uncaught exception handler and logs app launch for debugging.
+@main
 struct ButterflyButtoniOSDemoApp: App {
     init() {
         // Install an uncaught exception handler to surface messages in the console
         NSSetUncaughtExceptionHandler { exception in
             let symbols = exception.callStackSymbols.joined(separator: "\n")
-            NSLog("[ButterflyDemo] Uncaught exception: %@\nReason: %@\nStack:\n%@", exception.name.rawValue, exception.reason ?? "<none>", symbols)
+            NSLog(
+                "[ButterflyDemo] Uncaught exception: %@\nReason: %@\nStack:\n%@",
+                exception.name.rawValue,
+                exception.reason ?? "<none>",
+                symbols,
+            )
         }
         // Log that the demo app launched
         NSLog("[ButterflyDemo] Launching ButterflyButton iOS Demo…")
@@ -36,7 +41,6 @@ struct ButterflyButtoniOSDemoApp: App {
 
 /// Interactive iOS demo surface showcasing single-control configuration and a grid stress test.
 struct IOSDemoView: View {
-
     // MARK: Constants
 
     /// Layout, performance, and default configuration constants for the iOS demo UI.
@@ -116,16 +120,24 @@ struct IOSDemoView: View {
     @State private var eventLog: [String] = []
 
     @State private var gridDimension: Int = Constants.DEFAULT_GRID_DIMENSION
-    @State private var gridValues: [Int] = Array(repeating: 0, count: Constants.DEFAULT_GRID_DIMENSION * Constants.DEFAULT_GRID_DIMENSION)
+    @State private var gridValues: [Int] = Array(
+        repeating: 0,
+        count: Constants.DEFAULT_GRID_DIMENSION * Constants.DEFAULT_GRID_DIMENSION,
+    )
     @State private var gridPerformanceModeEnabled = true
     @State private var gridInfoPanel: GridInfoPanel = .eventLog
 
     // MARK: Computed
 
     /// Maximum height for the event log in the Single tab (~45% of container height), in points.
-    private var logMaxHeight: CGFloat { availableHeight * Constants.LOG_HEIGHT_RATIO }
+    private var logMaxHeight: CGFloat {
+        availableHeight * Constants.LOG_HEIGHT_RATIO
+    }
+
     /// Maximum height for the event log or matrix in the Grid tab controls bar (~20% of container height), in points.
-    private var gridLogMaxHeight: CGFloat { availableHeight * Constants.GRID_LOG_HEIGHT_RATIO }
+    private var gridLogMaxHeight: CGFloat {
+        availableHeight * Constants.GRID_LOG_HEIGHT_RATIO
+    }
 
     // MARK: Body
 
@@ -145,7 +157,7 @@ struct IOSDemoView: View {
             // UIScreen.main is deprecated in iOS 16; reading geometry here is the modern replacement.
             GeometryReader { geo in
                 Color.clear.onAppear { availableHeight = geo.size.height }
-            }
+            },
         )
         .onAppear {
             demoLog("TabView appear; initializing grid to \(gridDimension)x\(gridDimension)")
@@ -157,11 +169,11 @@ struct IOSDemoView: View {
 // MARK: - Views
 
 private extension IOSDemoView {
-
     var singleControlTab: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 // MARK: Pinned preview — stays fixed while form scrolls
+
                 HStack {
                     Spacer()
                     ButterflyButton(
@@ -185,11 +197,12 @@ private extension IOSDemoView {
                             isOn = newValue
                             demoLog("[Single] spin ended isOn=\(newValue)")
                             appendLog("spin ended isOn=\(newValue)")
-                        }
-                    ) {
-                        Text("Butterfly")
-                            .font(.headline)
-                    }
+                        },
+                        label: {
+                            Text("Butterfly")
+                                .font(.headline)
+                        },
+                    )
                     .disabled(isControlDisabled)
                     Spacer()
                 }
@@ -199,8 +212,10 @@ private extension IOSDemoView {
                 Divider()
 
                 // MARK: Scrollable controls
+
                 Form {
                     // MARK: State
+
                     Section("State") {
                         Toggle("On / Off", isOn: $isOn)
                             .disabled(isControlDisabled)
@@ -214,11 +229,12 @@ private extension IOSDemoView {
                     }
 
                     // MARK: Dimensions
+
                     Section("Dimensions") {
                         HStack {
                             Text("Size")
                                 .frame(width: 60, alignment: .leading)
-                            Slider(value: $sideLength, in: 44...120, step: 1) { editing in
+                            Slider(value: $sideLength, in: 44 ... 120, step: 1) { editing in
                                 if !editing { appendLog("size → \(Int(sideLength))") }
                             }
                             Text("\(Int(sideLength))")
@@ -228,7 +244,7 @@ private extension IOSDemoView {
                         HStack {
                             Text("Stroke")
                                 .frame(width: 60, alignment: .leading)
-                            Slider(value: $strokeWidth, in: 1...10, step: 0.5) { editing in
+                            Slider(value: $strokeWidth, in: 1 ... 10, step: 0.5) { editing in
                                 if !editing { appendLog("stroke → \(String(format: "%.1f", strokeWidth))") }
                             }
                             Text(String(format: "%.1f", strokeWidth))
@@ -238,7 +254,7 @@ private extension IOSDemoView {
                         HStack {
                             Text("Duration")
                                 .frame(width: 60, alignment: .leading)
-                            Slider(value: $spinDuration, in: 0.2...3.0, step: 0.1) { editing in
+                            Slider(value: $spinDuration, in: 0.2 ... 3.0, step: 0.1) { editing in
                                 if !editing { appendLog("duration → \(String(format: "%.1fs", spinDuration))") }
                             }
                             Text(String(format: "%.1fs", spinDuration))
@@ -248,7 +264,7 @@ private extension IOSDemoView {
                         HStack {
                             Text("Speed")
                                 .frame(width: 60, alignment: .leading)
-                            Slider(value: $spinSpeed, in: 0.25...2.5, step: 0.05) { editing in
+                            Slider(value: $spinSpeed, in: 0.25 ... 2.5, step: 0.05) { editing in
                                 if !editing { appendLog("speed → \(String(format: "%.2fx", spinSpeed))") }
                             }
                             Text(String(format: "%.2fx", spinSpeed))
@@ -258,6 +274,7 @@ private extension IOSDemoView {
                     }
 
                     // MARK: Style
+
                     Section("Style") {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Axle Orientation")
@@ -308,6 +325,7 @@ private extension IOSDemoView {
                     }
 
                     // MARK: Reset
+
                     Section {
                         Button("Reset Defaults") {
                             sideLength = Constants.DEFAULT_SIDE_LENGTH
@@ -326,13 +344,22 @@ private extension IOSDemoView {
                     }
 
                     // MARK: Event Log
+
                     Section("Event Log") {
                         eventLogView(maxHeight: logMaxHeight)
                     }
                 } // end Form
             } // end VStack
             .onAppear {
-                demoLog("Rendering single control with size=\(Int(sideLength)), stroke=\(String(format: "%.1f", strokeWidth)), duration=\(String(format: "%.2f", spinDuration)), speed=\(String(format: "%.2f", spinSpeed)))")
+                demoLog(
+                    """
+                    Rendering single control with \
+                    size=\(Int(sideLength)), \
+                    stroke=\(String(format: "%.1f", strokeWidth)), \
+                    duration=\(String(format: "%.2f", spinDuration)), \
+                    speed=\(String(format: "%.2f", spinSpeed)))
+                    """,
+                )
             }
             .navigationTitle("Butterfly iOS")
             .navigationBarTitleDisplayMode(.inline)
@@ -343,7 +370,7 @@ private extension IOSDemoView {
     var gridControlTab: some View {
         let gridItem = GridItem(
             .flexible(minimum: Constants.GRID_ITEM_MIN, maximum: Constants.GRID_ITEM_MAX),
-            spacing: Constants.GRID_SPACING
+            spacing: Constants.GRID_SPACING,
         )
         let columns = Array(repeating: gridItem, count: gridDimension)
         let usePerformanceMode = gridPerformanceModeEnabled ||
@@ -361,16 +388,17 @@ private extension IOSDemoView {
         NavigationStack {
             VStack(spacing: 0) {
                 // MARK: Pinned controls bar
+
                 VStack(spacing: Constants.GRID_SECTION_SPACING) {
                     HStack {
                         Text("Grid Size")
                         Slider(
                             value: Binding(
                                 get: { Double(gridDimension) },
-                                set: { newValue in resizeGrid(to: Int(newValue.rounded())) }
+                                set: { newValue in resizeGrid(to: Int(newValue.rounded())) },
                             ),
-                            in: Double(Constants.GRID_MIN_DIMENSION)...Double(Constants.GRID_MAX_DIMENSION),
-                            step: 1
+                            in: Double(Constants.GRID_MIN_DIMENSION) ... Double(Constants.GRID_MAX_DIMENSION),
+                            step: 1,
                         ) { editing in
                             if !editing { appendLog("gridSize → \(gridDimension)x\(gridDimension)") }
                         }
@@ -401,9 +429,10 @@ private extension IOSDemoView {
                 Divider()
 
                 // MARK: Scrollable grid
+
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: Constants.GRID_SPACING) {
-                        ForEach(0..<(gridDimension * gridDimension), id: \.self) { index in
+                        ForEach(0 ..< (gridDimension * gridDimension), id: \.self) { index in
                             ButterflyButton(
                                 isOn: cellBinding(for: index),
                                 sideLength: Constants.GRID_BUTTON_SIDE_LENGTH,
@@ -414,7 +443,7 @@ private extension IOSDemoView {
                                 hapticsEnabled: gridHapticsEnabled,
                                 onSpinEnded: { newValue in
                                     appendLog("grid[\(index)] isOn=\(newValue)")
-                                }
+                                },
                             )
                             .disabled(isControlDisabled)
                         }
@@ -422,12 +451,22 @@ private extension IOSDemoView {
                     .padding(Constants.GRID_SPACING + 2)
                 }
                 .onAppear {
-                    demoLog("Grid params: dim=\(gridDimension), perf=\(usePerformanceMode), dur=\(String(format: "%.2f", gridSpinDuration)), speed=\(String(format: "%.2f", gridSpinSpeed)), flick=\(gridFlickPhysics), haptics=\(gridHapticsEnabled))")
+                    demoLog(
+                        """
+                        Grid params: dim=\(gridDimension), \
+                        perf=\(usePerformanceMode), \
+                        dur=\(String(format: "%.2f", gridSpinDuration)), \
+                        speed=\(String(format: "%.2f", gridSpinSpeed)), \
+                        flick=\(gridFlickPhysics), \
+                        haptics=\(gridHapticsEnabled))
+                        """,
+                    )
                 }
 
                 Divider()
 
                 // MARK: Pinned reset button
+
                 Button("Reset Grid To 0") {
                     resizeGrid(to: gridDimension)
                 }
@@ -491,11 +530,11 @@ private extension IOSDemoView {
             let contentHeight = CGFloat(gridDimension) * Self.logLineHeight + 8
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 4) {
-                    ForEach(0..<gridDimension, id: \.self) { row in
+                    ForEach(0 ..< gridDimension, id: \.self) { row in
                         let start = row * gridDimension
-                        let end   = start + gridDimension
+                        let end = start + gridDimension
                         if end <= gridValues.count {
-                            let rowString = gridValues[start..<end]
+                            let rowString = gridValues[start ..< end]
                                 .map(String.init)
                                 .joined(separator: " ")
                             Text(rowString)
@@ -505,7 +544,7 @@ private extension IOSDemoView {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(
                                     RoundedRectangle(cornerRadius: Constants.EVENT_ROW_CORNER_RADIUS)
-                                        .fill(Color(uiColor: .secondarySystemBackground))
+                                        .fill(Color(uiColor: .secondarySystemBackground)),
                                 )
                         }
                     }
@@ -520,7 +559,6 @@ private extension IOSDemoView {
 // MARK: - Helpers
 
 private extension IOSDemoView {
-
     /// Writes a message to the system console via NSLog.
     ///
     /// - Parameter message: Message to log.
@@ -537,12 +575,12 @@ private extension IOSDemoView {
     @discardableResult
     func assertOrClamp(_ condition: @autoclosure () -> Bool, _ message: @autoclosure () -> String) -> Bool {
         #if DEBUG
-        precondition(condition(), message())
-        return condition()
+            precondition(condition(), message())
+            return condition()
         #else
-        let ok = condition()
-        if !ok { demoLog("ASSERTION WOULD FAIL: \(message())") }
-        return ok
+            let ok = condition()
+            if !ok { demoLog("ASSERTION WOULD FAIL: \(message())") }
+            return ok
         #endif
     }
 
@@ -563,7 +601,7 @@ private extension IOSDemoView {
             medallionTopLabel: "",
             medallionBottomLabel: "",
             medallionLabelColor: .clear,
-            medallionShape: medallionShape
+            medallionShape: medallionShape,
         )
     }
 
@@ -584,15 +622,21 @@ private extension IOSDemoView {
     func cellBinding(for index: Int) -> Binding<Bool> {
         Binding(
             get: {
-                let ok = assertOrClamp(gridValues.indices.contains(index), "Grid index out of bounds (get): \(index) for dim=\(gridDimension)")
+                let ok = assertOrClamp(
+                    gridValues.indices.contains(index),
+                    "Grid index out of bounds (get): \(index) for dim=\(gridDimension)",
+                )
                 guard ok else { return false }
                 return gridValues[index] == 1
             },
             set: { newValue in
-                let ok = assertOrClamp(gridValues.indices.contains(index), "Grid index out of bounds (set): \(index) for dim=\(gridDimension)")
+                let ok = assertOrClamp(
+                    gridValues.indices.contains(index),
+                    "Grid index out of bounds (set): \(index) for dim=\(gridDimension)",
+                )
                 guard ok else { return }
                 gridValues[index] = newValue ? 1 : 0
-            }
+            },
         )
     }
 
@@ -608,5 +652,3 @@ private extension IOSDemoView {
         }
     }
 }
-
-

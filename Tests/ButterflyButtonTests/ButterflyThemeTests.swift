@@ -14,13 +14,13 @@ import Testing
         medallionTopColor: .green,
         medallionBottomColor: .yellow,
         medallionEdgeColor: .orange,
-        medallionLabelColor: .purple
+        medallionLabelColor: .purple,
     )
     let input = ThemeInput(
         style: style,
         colorScheme: .light,
         contrast: .standard,
-        isEnabled: true
+        isEnabled: true,
     )
 
     #expect(input.colorScheme == .light)
@@ -41,7 +41,7 @@ import Testing
         style: style,
         colorScheme: .dark,
         contrast: .increased,
-        isEnabled: false
+        isEnabled: false,
     )
 
     #expect(input.colorScheme == .dark)
@@ -68,7 +68,7 @@ import Testing
         medallionTopColor: .green,
         medallionBottomColor: .yellow,
         medallionEdgeColor: .orange,
-        medallionLabelColor: .purple
+        medallionLabelColor: .purple,
     )
 
     #expect(input.mountStrokeColor == .red)
@@ -88,7 +88,7 @@ import Testing
         medallionTopColor: .green,
         medallionBottomColor: .yellow,
         medallionEdgeColor: .orange,
-        medallionLabelColor: .purple
+        medallionLabelColor: .purple,
     )
     let theme = ButterflyTheme.resolve(input)
 
@@ -104,7 +104,7 @@ import Testing
         medallionTopColor: .green,
         medallionBottomColor: .yellow,
         medallionEdgeColor: .orange,
-        medallionLabelColor: .purple
+        medallionLabelColor: .purple,
     )
     let enabledTheme = ButterflyTheme.resolve(enabledInput)
 
@@ -118,12 +118,12 @@ import Testing
     let lightStandard = ButterflyTheme.resolve(ThemeInput(
         colorScheme: .light, contrast: .standard, isEnabled: false,
         mountStrokeColor: nil, axleColor: nil, medallionTopColor: nil,
-        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil
+        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil,
     ))
     let darkIncreased = ButterflyTheme.resolve(ThemeInput(
         colorScheme: .dark, contrast: .increased, isEnabled: false,
         mountStrokeColor: nil, axleColor: nil, medallionTopColor: nil,
-        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil
+        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil,
     ))
 
     // Disabled path ignores contrast and scheme for most colors.
@@ -147,7 +147,7 @@ import Testing
         medallionTopColor: .green,
         medallionBottomColor: .yellow,
         medallionEdgeColor: .orange,
-        medallionLabelColor: .purple
+        medallionLabelColor: .purple,
     )
     let theme = ButterflyTheme.resolve(input)
 
@@ -171,7 +171,7 @@ import Testing
         medallionTopColor: nil,
         medallionBottomColor: nil,
         medallionEdgeColor: nil,
-        medallionLabelColor: nil
+        medallionLabelColor: nil,
     )
     let theme = ButterflyTheme.resolve(input)
 
@@ -192,7 +192,7 @@ import Testing
         medallionTopColor: nil,
         medallionBottomColor: nil,
         medallionEdgeColor: nil,
-        medallionLabelColor: nil
+        medallionLabelColor: nil,
     )
     let theme = ButterflyTheme.resolve(input)
 
@@ -211,7 +211,7 @@ import Testing
         medallionTopColor: nil,
         medallionBottomColor: nil,
         medallionEdgeColor: nil,
-        medallionLabelColor: nil
+        medallionLabelColor: nil,
     )
     let theme = ButterflyTheme.resolve(input)
 
@@ -226,12 +226,12 @@ import Testing
     let dark = ButterflyTheme.resolve(ThemeInput(
         colorScheme: .dark, contrast: .standard, isEnabled: true,
         mountStrokeColor: nil, axleColor: nil, medallionTopColor: nil,
-        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil
+        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil,
     ))
     let light = ButterflyTheme.resolve(ThemeInput(
         colorScheme: .light, contrast: .standard, isEnabled: true,
         mountStrokeColor: nil, axleColor: nil, medallionTopColor: nil,
-        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil
+        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil,
     ))
 
     #expect(dark.mountBackground != light.mountBackground)
@@ -253,12 +253,12 @@ import Testing
     let standard = ButterflyTheme.resolve(ThemeInput(
         colorScheme: .light, contrast: .standard, isEnabled: true,
         mountStrokeColor: nil, axleColor: nil, medallionTopColor: nil,
-        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil
+        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil,
     ))
     let high = ButterflyTheme.resolve(ThemeInput(
         colorScheme: .light, contrast: .increased, isEnabled: true,
         mountStrokeColor: nil, axleColor: nil, medallionTopColor: nil,
-        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil
+        medallionBottomColor: nil, medallionEdgeColor: nil, medallionLabelColor: nil,
     ))
 
     // Standard uses .primary.opacity(0.7); high contrast uses .primary at full opacity.

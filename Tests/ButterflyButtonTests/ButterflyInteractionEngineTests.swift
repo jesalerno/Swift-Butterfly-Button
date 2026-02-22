@@ -110,7 +110,7 @@ import Testing
     // Manually set spinToken near overflow via beginSpin calls.
     // We can't reach UInt64.max in a loop, so we test the wrapping arithmetic directly.
     // beginSpin uses &+=, so we verify the struct is usable after many spins.
-    for _ in 0..<1000 {
+    for _ in 0 ..< 1000 {
         _ = coordinator.beginSpin()
     }
     let latest = coordinator.beginSpin()

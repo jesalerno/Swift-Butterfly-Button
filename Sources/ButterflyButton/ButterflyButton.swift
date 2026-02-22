@@ -3,11 +3,11 @@
 import OSLog
 import SwiftUI
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
-@MainActor
 /// A flip-style SwiftUI toggle control with gesture-driven animation.
+@MainActor
 public struct ButterflyButton: View {
     @MainActor private enum UIConstants {
         static let defaultSideLength: CGFloat = 60
@@ -125,9 +125,9 @@ public struct ButterflyButton: View {
         onSpinBegan: (() -> Void)?,
         onSpinCompleted: ((_ isOn: Bool) -> Void)?,
         onSpinEnded: ((_ isOn: Bool) -> Void)?,
-        outerLabel: AnyView?
+        outerLabel: AnyView?,
     ) {
-        self._isOn = isOn
+        _isOn = isOn
         self.sideLength = sideLength
         self.labelPlacement = labelPlacement
         self.style = style
@@ -168,7 +168,7 @@ public struct ButterflyButton: View {
         hapticsEnabled: Bool = true,
         onSpinBegan: (() -> Void)? = nil,
         onSpinCompleted: ((_ isOn: Bool) -> Void)? = nil,
-        onSpinEnded: ((_ isOn: Bool) -> Void)? = nil
+        onSpinEnded: ((_ isOn: Bool) -> Void)? = nil,
     ) {
         self.init(
             isOn: isOn,
@@ -182,7 +182,7 @@ public struct ButterflyButton: View {
             onSpinBegan: onSpinBegan,
             onSpinCompleted: onSpinCompleted,
             onSpinEnded: onSpinEnded,
-            outerLabel: nil
+            outerLabel: nil,
         )
     }
 
@@ -213,7 +213,7 @@ public struct ButterflyButton: View {
         onSpinBegan: (() -> Void)? = nil,
         onSpinCompleted: ((_ isOn: Bool) -> Void)? = nil,
         onSpinEnded: ((_ isOn: Bool) -> Void)? = nil,
-        @ViewBuilder label: () -> some View
+        @ViewBuilder label: () -> some View,
     ) {
         self.init(
             isOn: isOn,
@@ -227,7 +227,7 @@ public struct ButterflyButton: View {
             onSpinBegan: onSpinBegan,
             onSpinCompleted: onSpinCompleted,
             onSpinEnded: onSpinEnded,
-            outerLabel: AnyView(label())
+            outerLabel: AnyView(label()),
         )
     }
 
@@ -242,7 +242,7 @@ public struct ButterflyButton: View {
             placement: labelPlacement,
             effectiveRTL: layoutDirection == .rightToLeft,
             label: outerLabel,
-            mount: controlSurface(resolved: resolved)
+            mount: controlSurface(resolved: resolved),
         )
         .onAppear { handleAppear(resolved: resolved) }
         .onChange(of: isOn) { _, newValue in
@@ -263,14 +263,14 @@ public struct ButterflyButton: View {
                 strokeColor: resolved.theme.mountStroke,
                 background: style.mountBackground,
                 systemBackground: resolved.theme.mountBackground,
-                reduceTransparencyEnabled: reduceTransparency
+                reduceTransparencyEnabled: reduceTransparency,
             )
 
             AxleView(
                 sideLength: resolved.clampedSide,
                 strokeWidth: UIConstants.axleStrokeWidth,
                 orientation: style.axleOrientation,
-                color: resolved.theme.axle
+                color: resolved.theme.axle,
             )
 
             MedallionView(
@@ -287,21 +287,14 @@ public struct ButterflyButton: View {
                 labelColor: resolved.theme.medallionLabel,
                 shape: style.medallionShape,
                 rotationDegrees: rotationDegrees,
-                rotationAxis: resolved.rotationAxis
+                rotationAxis: resolved.rotationAxis,
             )
             .scaleEffect(pulseScale)
         }
         .frame(width: resolved.clampedSide, height: resolved.clampedSide)
         .contentShape(Rectangle())
         .gesture(spinGesture(resolved: resolved))
-        .overlay(
-            Group {
-                if differentiateWithoutColor || showButtonShapes {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(resolved.theme.mountStroke, lineWidth: max(1, resolved.clampedStroke))
-                }
-            }
-        )
+        .overlay(accessibilityBorderOverlay(resolved: resolved))
         .modifier(
             ButterflyButtonAccessibilityModifier(
                 isOn: isOn,
@@ -310,22 +303,30 @@ public struct ButterflyButton: View {
                 accessibilityToggleActionKey: UIConstants.accessibilityToggleAction,
                 accessibilityStateOn: UIConstants.accessibilityStateOn,
                 accessibilityStateOff: UIConstants.accessibilityStateOff,
-                performToggle: { performToggleAccessibilityAction(duration: resolved.validDuration) }
-            )
+                performToggle: { performToggleAccessibilityAction(duration: resolved.validDuration) },
+            ),
         )
         .frame(minWidth: UIConstants.minimumHitSize, minHeight: UIConstants.minimumHitSize)
         #if os(iOS) || os(macOS)
-        .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.12)) {
-                pulseScale = hovering ? 1.03 : 1.0
+            .onHover { hovering in
+                withAnimation(.easeInOut(duration: 0.12)) {
+                    pulseScale = hovering ? 1.03 : 1.0
+                }
             }
-        }
         #endif
-        .allowsHitTesting(isEnabled)
+            .allowsHitTesting(isEnabled)
     }
 }
 
 private extension ButterflyButton {
+    @ViewBuilder
+    private func accessibilityBorderOverlay(resolved: ResolvedValues) -> some View {
+        if differentiateWithoutColor || showButtonShapes {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(resolved.theme.mountStroke, lineWidth: max(1, resolved.clampedStroke))
+        }
+    }
+
     private var resolvedValues: ResolvedValues {
         let clampedSide = ButterflyValidation.clampedSideLength(sideLength)
         let clampedStroke = ButterflyValidation.clampedMountStrokeWidth(style.mountStrokeWidth, sideLength: clampedSide)
@@ -335,7 +336,7 @@ private extension ButterflyButton {
             style: style,
             colorScheme: colorScheme,
             contrast: colorSchemeContrast,
-            isEnabled: isEnabled
+            isEnabled: isEnabled,
         ))
 
         return ResolvedValues(
@@ -343,8 +344,11 @@ private extension ButterflyButton {
             clampedStroke: clampedStroke,
             validDuration: validDuration,
             theme: theme,
-            medallionDiameter: ButterflyValidation.medallionDiameter(sideLength: clampedSide, strokeWidth: clampedStroke),
-            rotationAxis: ButterflyValidation.rotationAxis(for: style.axleOrientation)
+            medallionDiameter: ButterflyValidation.medallionDiameter(
+                sideLength: clampedSide,
+                strokeWidth: clampedStroke,
+            ),
+            rotationAxis: ButterflyValidation.rotationAxis(for: style.axleOrientation),
         )
     }
 
@@ -366,7 +370,7 @@ private extension ButterflyButton {
                 guard isEnabled else { return }
                 let direction = ButterflyValidation.direction(
                     for: value.location,
-                    in: CGSize(width: resolved.clampedSide, height: resolved.clampedSide)
+                    in: CGSize(width: resolved.clampedSide, height: resolved.clampedSide),
                 )
                 let velocity = predictedVelocityMagnitude(for: value)
                 triggerSpin(direction: direction, velocity: velocity, duration: resolved.validDuration)
@@ -405,14 +409,14 @@ private extension ButterflyButton {
     private func animateExternalStateChange(newValue: Bool, sign: Double) {
         let duration = max(
             ButterflyValidation.validSpinDuration(spinDecelerationDuration),
-            MotionConstants.externalStateMinimumDuration
+            MotionConstants.externalStateMinimumDuration,
         )
         let speed = ButterflyValidation.validSpinSpeed(spinSpeed)
         let totalDegrees = ButterflyValidation.spinDegrees(
             duration: duration,
             spinSpeed: speed,
             velocity: 0,
-            enableFlickPhysics: false
+            enableFlickPhysics: false,
         )
 
         Task { @MainActor in
@@ -420,19 +424,19 @@ private extension ButterflyButton {
             let halfTurns = ButterflyValidation.fittedHalfTurns(
                 from: totalDegrees,
                 duration: duration,
-                minimumSegmentDuration: MotionConstants.minimumHalfTurnDuration
+                minimumSegmentDuration: MotionConstants.minimumHalfTurnDuration,
             )
             await animateHalfTurns(
                 token: token,
                 halfTurns: halfTurns,
                 sign: sign,
-                totalDuration: duration
+                totalDuration: duration,
             )
             guard coordinator.isCurrentSpinToken(token) else { return }
             guard isOn == newValue else { return }
             rotationDegrees = ButterflyValidation.snappedStopRotationDegrees(
                 current: rotationDegrees,
-                isOn: newValue
+                isOn: newValue,
             )
             onSpinEnded?(isOn)
         }
@@ -456,15 +460,16 @@ private extension ButterflyButton {
             }
             withAnimation(
                 .easeInOut(duration: MotionConstants.reducedMotionPhaseDuration)
-                    .delay(MotionConstants.reducedMotionPhaseDuration)
+                    .delay(MotionConstants.reducedMotionPhaseDuration),
             ) {
                 pulseScale = 1
             }
             Task { @MainActor in
-                guard await sleepForAnimationInterval(
-                    MotionConstants.reducedMotionTotalDuration,
-                    context: "reducedMotionCompletion"
-                ) else { return }
+                guard
+                    await sleepForAnimationInterval(
+                        MotionConstants.reducedMotionTotalDuration,
+                        context: "reducedMotionCompletion",
+                    ) else { return }
                 finalizeSpinIfTokenIsCurrent(token: token, targetIsOn: targetIsOn)
             }
             return
@@ -474,13 +479,13 @@ private extension ButterflyButton {
             duration: duration,
             spinSpeed: ButterflyValidation.validSpinSpeed(spinSpeed),
             velocity: velocity,
-            enableFlickPhysics: enableFlickPhysics
+            enableFlickPhysics: enableFlickPhysics,
         )
         let sign = direction == .topToBottom ? 1.0 : -1.0
         let halfTurns = ButterflyValidation.fittedHalfTurns(
             from: totalDegrees,
             duration: duration,
-            minimumSegmentDuration: MotionConstants.minimumHalfTurnDuration
+            minimumSegmentDuration: MotionConstants.minimumHalfTurnDuration,
         )
 
         Task { @MainActor in
@@ -488,7 +493,7 @@ private extension ButterflyButton {
                 token: token,
                 halfTurns: halfTurns,
                 sign: sign,
-                totalDuration: duration
+                totalDuration: duration,
             )
             finalizeSpinIfTokenIsCurrent(token: token, targetIsOn: targetIsOn)
         }
@@ -504,14 +509,14 @@ private extension ButterflyButton {
         coordinator.markInternalToggle()
         let snapped = ButterflyValidation.snappedStopRotationDegrees(
             current: rotationDegrees,
-            isOn: targetIsOn
+            isOn: targetIsOn,
         )
         rotationDegrees = snapped
         isOn = ButterflyValidation.visibleTopFace(rotationDegrees: snapped)
         if hapticsEnabled {
             #if canImport(UIKit)
-            let generator = UIImpactFeedbackGenerator(style: .medium)
-            generator.impactOccurred()
+                let generator = UIImpactFeedbackGenerator(style: .medium)
+                generator.impactOccurred()
             #endif
         }
         onSpinCompleted?(isOn)
@@ -528,18 +533,19 @@ private extension ButterflyButton {
     private func animateHalfTurns(token: UInt64, halfTurns: Int, sign: Double, totalDuration: TimeInterval) async {
         let segmentDuration = max(
             totalDuration / Double(max(halfTurns, 1)),
-            0.001
+            0.001,
         )
 
-        for _ in 0..<halfTurns {
+        for _ in 0 ..< halfTurns {
             guard coordinator.isCurrentSpinToken(token) else { return }
             withAnimation(.linear(duration: segmentDuration)) {
                 rotationDegrees += sign * 180
             }
-            guard await sleepForAnimationInterval(
-                segmentDuration,
-                context: "halfTurnSegment"
-            ) else { return }
+            guard
+                await sleepForAnimationInterval(
+                    segmentDuration,
+                    context: "halfTurnSegment",
+                ) else { return }
         }
     }
 
@@ -576,11 +582,23 @@ private extension ButterflyButton {
             logger.warning("spinSpeed <= 0. Falling back to 1.0")
         }
         if resolved.clampedSide != sideLength {
-            logger.warning("sideLength clamped from \(sideLength, privacy: .public) to \(resolved.clampedSide, privacy: .public)")
+            logger
+                .warning(
+                    """
+                    sideLength clamped from \(sideLength, privacy: .public) \
+                    to \(resolved.clampedSide, privacy: .public)
+                    """,
+                )
         }
         if resolved.clampedStroke != style.mountStrokeWidth {
-            logger.warning("mountStrokeWidth clamped from \(style.mountStrokeWidth, privacy: .public) to \(resolved.clampedStroke, privacy: .public)")
+            logger
+                .warning(
+                    """
+                    mountStrokeWidth clamped from \
+                    \(style.mountStrokeWidth, privacy: .public) \
+                    to \(resolved.clampedStroke, privacy: .public)
+                    """,
+                )
         }
     }
 }
-

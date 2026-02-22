@@ -19,7 +19,7 @@ struct ThemeInput {
 
 extension ThemeInput {
     /// Convenience initializer that extracts color overrides from a
-    ///  
+    ///
     ///  ButterflyButtonStyle.
     ///
     /// Defined in an extension so Swift preserves the auto-generated memberwise initializer.
@@ -39,7 +39,7 @@ extension ThemeInput {
             medallionTopColor: style.medallionTopColor,
             medallionBottomColor: style.medallionBottomColor,
             medallionEdgeColor: style.medallionEdgeColor,
-            medallionLabelColor: style.medallionLabelColor
+            medallionLabelColor: style.medallionLabelColor,
         )
     }
 }
@@ -57,19 +57,23 @@ struct ButterflyTheme {
     let medallionLabel: Color
 
     // MARK: - Theme Constants
+
     /// Implementation constants for theme computation (opacity values and related constants).
     enum Constants {
         // MARK: Background
+
         /// Opacity for the mount background when the system is in Dark Mode.
         static let DARK_MOUNT_BACKGROUND_OPACITY: Double = 0.08
         /// Opacity for the mount background when the system is in Light Mode.
         static let LIGHT_MOUNT_BACKGROUND_OPACITY: Double = 0.04
 
         // MARK: Contrast
+
         /// Opacity for the medallion edge when not in increased contrast mode.
         static let MEDALLION_EDGE_LOW_CONTRAST_OPACITY: Double = 0.7
 
         // MARK: Disabled state
+
         /// Base opacity for disabled surfaces (HIG range 0.06–0.12).
         static let DISABLED_OPACITY: Double = 0.09
         /// Opacity for the mount stroke when disabled.
@@ -87,6 +91,7 @@ struct ButterflyTheme {
     }
 
     // MARK: - Test/Preview Constants (exposed for testability)
+
     /// Constants exposed for testing and previews to ensure stable expectations.
     enum PreviewConstants {
         /// Opacity for the mount background in Dark Mode.
@@ -104,7 +109,7 @@ struct ButterflyTheme {
     /// - Returns: A concrete theme for rendering.
     static func resolve(_ input: ThemeInput) -> Self {
         if !input.isEnabled {
-            return Self.disabled(colorScheme: input.colorScheme)
+            return disabled(colorScheme: input.colorScheme)
         }
 
         let highContrast = input.contrast == .increased
@@ -119,8 +124,9 @@ struct ButterflyTheme {
             axle: highContrast ? .primary : baseAxle,
             medallionTop: input.medallionTopColor ?? .accentColor,
             medallionBottom: input.medallionBottomColor ?? .secondary,
-            medallionEdge: input.medallionEdgeColor ?? .primary.opacity(highContrast ? 1 : Constants.MEDALLION_EDGE_LOW_CONTRAST_OPACITY),
-            medallionLabel: input.medallionLabelColor ?? .primary
+            medallionEdge: input.medallionEdgeColor ?? .primary
+                .opacity(highContrast ? 1 : Constants.MEDALLION_EDGE_LOW_CONTRAST_OPACITY),
+            medallionLabel: input.medallionLabelColor ?? .primary,
         )
     }
 
@@ -128,7 +134,7 @@ struct ButterflyTheme {
     ///
     /// - Parameter colorScheme: Current system color scheme.
     /// - Returns: Disabled theme values.
-    private static func disabled(colorScheme: ColorScheme) -> Self {
+    private static func disabled(colorScheme _: ColorScheme) -> Self {
         let background = Color.secondary.opacity(Constants.DISABLED_OPACITY)
         return Self(
             mountStroke: .secondary.opacity(Constants.DISABLED_STROKE_OPACITY),
@@ -137,8 +143,7 @@ struct ButterflyTheme {
             medallionTop: .gray.opacity(Constants.DISABLED_MEDALLION_TOP_OPACITY),
             medallionBottom: .gray.opacity(Constants.DISABLED_MEDALLION_BOTTOM_OPACITY),
             medallionEdge: .secondary.opacity(Constants.DISABLED_MEDALLION_EDGE_OPACITY),
-            medallionLabel: .white.opacity(Constants.DISABLED_MEDALLION_LABEL_OPACITY)
+            medallionLabel: .white.opacity(Constants.DISABLED_MEDALLION_LABEL_OPACITY),
         )
     }
 }
-

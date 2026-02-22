@@ -1,6 +1,6 @@
-/// Accessibility modifiers for ButterflyButton.
-///
-/// Encapsulates labels, values, and custom actions to expose toggle semantics to assistive technologies.
+// Accessibility modifiers for ButterflyButton.
+//
+// Encapsulates labels, values, and custom actions to expose toggle semantics to assistive technologies.
 import SwiftUI
 
 /// Applies accessibility semantics and actions for `ButterflyButton`.

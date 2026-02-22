@@ -5,6 +5,25 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <PreActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "SwiftFormat"
+               scriptText = "export SWIFTFORMAT_CONFIG=Tools/.swiftformat&#10;export SRCROOT=$(git -C &quot;$(dirname &quot;$WORKSPACE_PATH&quot;)&quot; rev-parse --show-toplevel)&#10;&quot;$SRCROOT/Tools/xcode-swiftformat.sh&quot;&#10;"
+               shellToInvoke = "/bin/bash">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "ButterflyButton"
+                     BuildableName = "ButterflyButton"
+                     BlueprintName = "ButterflyButton"
+                     ReferencedContainer = "container:">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -18,6 +37,34 @@
                BuildableName = "ButterflyButton"
                BlueprintName = "ButterflyButton"
                ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB100000000000000000000B"
+               BuildableName = "ButterflyButtoniOSDemo.app"
+               BlueprintName = "ButterflyButtoniOSDemo"
+               ReferencedContainer = "container:Examples/ButterflyButtoniOSDemo/ButterflyButtoniOSDemo.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB200000000000000000000B"
+               BuildableName = "ButterflyButtonMacDemo.app"
+               BlueprintName = "ButterflyButtonMacDemo"
+               ReferencedContainer = "container:Examples/ButterflyButtonMacDemo/ButterflyButtonMacDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

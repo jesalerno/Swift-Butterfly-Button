@@ -4,7 +4,7 @@ import Foundation
 import SwiftUI
 
 /// Validation and math helpers used by `ButterflyButton`.
-struct ButterflyValidation {
+enum ButterflyValidation {
     static let minimumSideLength: CGFloat = 44
     static let minimumStrokeWidth: CGFloat = 1
     static let defaultStrokeWidth: CGFloat = 2
@@ -100,13 +100,13 @@ extension ButterflyValidation {
     static func rotationAxis(for orientation: AxleOrientation) -> ButterflyRotationAxis {
         switch orientation {
         case .horizontal:
-            return ButterflyRotationAxis(x: 1, y: 0, z: 0)
+            ButterflyRotationAxis(x: 1, y: 0, z: 0)
         case .vertical:
-            return ButterflyRotationAxis(x: 0, y: 1, z: 0)
+            ButterflyRotationAxis(x: 0, y: 1, z: 0)
         case .diagonalLTR:
-            return ButterflyRotationAxis(x: 1, y: 1, z: 0)
+            ButterflyRotationAxis(x: 1, y: 1, z: 0)
         case .diagonalRTL:
-            return ButterflyRotationAxis(x: 1, y: -1, z: 0)
+            ButterflyRotationAxis(x: 1, y: -1, z: 0)
         }
     }
 
@@ -121,7 +121,7 @@ extension ButterflyValidation {
             duration: defaultSpinDuration,
             spinSpeed: defaultSpinSpeed,
             velocity: velocity,
-            enableFlickPhysics: enableFlickPhysics
+            enableFlickPhysics: enableFlickPhysics,
         )
     }
 
@@ -133,7 +133,14 @@ extension ButterflyValidation {
     ///   - velocity: Gesture velocity magnitude.
     ///   - enableFlickPhysics: Whether velocity should add spin boost.
     /// - Returns: Total spin degrees snapped to an odd half-turn count.
-    static func spinDegrees(duration: TimeInterval, spinSpeed: Double, velocity: CGFloat, enableFlickPhysics: Bool) -> Double {
+    static func spinDegrees(
+        duration: TimeInterval,
+        spinSpeed: Double,
+        velocity: CGFloat,
+        enableFlickPhysics: Bool,
+    )
+        -> Double
+    {
         let validDuration = max(validSpinDuration(duration), 0.1)
         let validSpeed = validSpinSpeed(spinSpeed)
         let clampedVelocity = (velocity.isFinite && velocity > 0) ? velocity : 0
@@ -159,8 +166,10 @@ extension ButterflyValidation {
     static func fittedHalfTurns(
         from totalDegrees: Double,
         duration: TimeInterval,
-        minimumSegmentDuration: TimeInterval
-    ) -> Int {
+        minimumSegmentDuration: TimeInterval,
+    )
+        -> Int
+    {
         guard totalDegrees.isFinite, duration.isFinite, minimumSegmentDuration.isFinite else {
             return 1
         }
@@ -211,4 +220,3 @@ extension ButterflyValidation {
         return Double(halfTurns) * 180.0
     }
 }
-

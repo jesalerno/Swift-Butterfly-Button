@@ -96,7 +96,7 @@ import Testing
     let fitted = ButterflyValidation.fittedHalfTurns(
         from: 9000,
         duration: 1.0,
-        minimumSegmentDuration: 0.05
+        minimumSegmentDuration: 0.05,
     )
     #expect(fitted <= 20)
     #expect(fitted % 2 == 1)
@@ -188,7 +188,7 @@ import Testing
     let result = ButterflyValidation.fittedHalfTurns(
         from: 1080,
         duration: 1.0,
-        minimumSegmentDuration: 0
+        minimumSegmentDuration: 0,
     )
     #expect(result >= 1)
     #expect(result % 2 == 1)
@@ -199,7 +199,7 @@ import Testing
     let result = ButterflyValidation.fittedHalfTurns(
         from: 5400,
         duration: 0.001,
-        minimumSegmentDuration: 0.05
+        minimumSegmentDuration: 0.05,
     )
     #expect(result == 1)
 }
@@ -237,10 +237,10 @@ import Testing
 /// Verifies spinDegrees with velocity at the boost cap (900 degrees max boost).
 @Test func spinDegrees_velocityBoostCappedAt900() {
     let atCap = ButterflyValidation.spinDegrees(
-        duration: 2.0, spinSpeed: 1.0, velocity: 1500, enableFlickPhysics: true
+        duration: 2.0, spinSpeed: 1.0, velocity: 1500, enableFlickPhysics: true,
     )
     let beyondCap = ButterflyValidation.spinDegrees(
-        duration: 2.0, spinSpeed: 1.0, velocity: 99999, enableFlickPhysics: true
+        duration: 2.0, spinSpeed: 1.0, velocity: 99999, enableFlickPhysics: true,
     )
     // Both should produce the same result since velocity boost caps at 900.
     #expect(atCap == beyondCap)
@@ -249,10 +249,10 @@ import Testing
 /// Verifies spinDegrees with negative velocity (treated as 0, no boost).
 @Test func spinDegrees_negativeVelocityTreatedAsZero() {
     let negative = ButterflyValidation.spinDegrees(
-        duration: 2.0, spinSpeed: 1.0, velocity: -500, enableFlickPhysics: true
+        duration: 2.0, spinSpeed: 1.0, velocity: -500, enableFlickPhysics: true,
     )
     let zero = ButterflyValidation.spinDegrees(
-        duration: 2.0, spinSpeed: 1.0, velocity: 0, enableFlickPhysics: true
+        duration: 2.0, spinSpeed: 1.0, velocity: 0, enableFlickPhysics: true,
     )
     #expect(negative == zero)
 }

@@ -1,0 +1,49 @@
+
+# --------------------------------------------------------------------
+# SwiftFormat Configuration
+# --------------------------------------------------------------------
+# Philosophy:
+# - Make formatting deterministic.
+# - Avoid stylistic churn.
+# - Keep results compatible with SwiftLint defaults + your overrides.
+# --------------------------------------------------------------------
+
+# ---------- Swift version ----------
+--swift-version 6.2
+
+# ---------- Line length (aligns with SwiftLint warning=120) ----------
+--max-width 120
+
+# ---------- Indentation ----------
+--indent 4
+--tab-width 4
+
+# ---------- Whitespace & wrapping ----------
+--trim-whitespace always
+--wrap-arguments before-first
+--wrap-parameters before-first
+--wrap-collections before-first
+--wrap-conditions before-first
+--wrap-return-type if-multiline
+--wrap-type-aliases before-first
+
+# ---------- Braces / blocks ----------
+--allman false
+--else-position same-line
+--guard-else same-line
+
+# ---------- Imports ----------
+--import-grouping testable-last
+
+# ---------- Trailing commas ----------
+--trailing-commas always
+
+# ---------- Redundancy cleanup ----------
+--self remove
+--nil-init remove
+
+# ---------- Closures ----------
+--closure-void remove
+
+# ---------- Files / paths ----------
+# --exclude Pods,Carthage,.build,DerivedData,Generated
