@@ -15,6 +15,9 @@ let package = Package(
             targets: ["ButterflyButton"]
         )
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin.git", from: "1.0.0")
+    ],
     targets: [
         .target(
             name: "ButterflyButton",
