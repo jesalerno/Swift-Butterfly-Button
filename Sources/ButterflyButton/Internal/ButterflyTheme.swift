@@ -2,6 +2,9 @@
 
 import SwiftUI
 
+/// Parameters used to resolve a concrete `ButterflyTheme` from environment and style overrides.
+///
+/// This type is internal to the package and intentionally lightweight to keep resolution fast.
 struct ThemeInput {
     let colorScheme: ColorScheme
     let contrast: ColorSchemeContrast
@@ -15,7 +18,9 @@ struct ThemeInput {
 }
 
 extension ThemeInput {
-    /// Convenience initializer that extracts color overrides from a `ButterflyButtonStyle`.
+    /// Convenience initializer that extracts color overrides from a
+    ///  
+    ///  ButterflyButtonStyle.
     ///
     /// Defined in an extension so Swift preserves the auto-generated memberwise initializer.
     ///
@@ -39,7 +44,9 @@ extension ThemeInput {
     }
 }
 
-/// Resolved color values used by `ButterflyButton` rendering primitives.
+/// Resolved, concrete color values used by the rendering primitives.
+///
+/// The result of `resolve(_:)` reflects the current color scheme, contrast and enabled state.
 struct ButterflyTheme {
     let mountStroke: Color
     let mountBackground: Color
@@ -50,7 +57,7 @@ struct ButterflyTheme {
     let medallionLabel: Color
 
     // MARK: - Theme Constants
-    /// Namespaced constants for `ButterflyTheme`.
+    /// Implementation constants for theme computation (opacity values and related constants).
     enum Constants {
         // MARK: Background
         /// Opacity for the mount background when the system is in Dark Mode.
@@ -80,7 +87,7 @@ struct ButterflyTheme {
     }
 
     // MARK: - Test/Preview Constants (exposed for testability)
-    /// A small set of constants exposed for tests and previews.
+    /// Constants exposed for testing and previews to ensure stable expectations.
     enum PreviewConstants {
         /// Opacity for the mount background in Dark Mode.
         static let DARK_MOUNT_BACKGROUND_OPACITY = Constants.DARK_MOUNT_BACKGROUND_OPACITY
@@ -90,11 +97,11 @@ struct ButterflyTheme {
         static let DISABLED_OPACITY = Constants.DISABLED_OPACITY
     }
 
-    /// Resolves theme colors from environment and style overrides.
+    /// Resolves theme colors from environment and optional style overrides.
     ///
-    /// - Parameters:
-    ///   - input: A `ThemeInput` struct containing environment and override parameters.
-    /// - Returns: Resolved theme colors.
+    /// Disabled state takes precedence over all other inputs.
+    /// - Parameter input: Environment and optional override parameters.
+    /// - Returns: A concrete theme for rendering.
     static func resolve(_ input: ThemeInput) -> Self {
         if !input.isEnabled {
             return Self.disabled(colorScheme: input.colorScheme)
@@ -117,10 +124,10 @@ struct ButterflyTheme {
         )
     }
 
-    /// Returns disabled-state colors for the provided color scheme.
+    /// Produces disabled-state theme values for the provided color scheme.
     ///
-    /// - Parameter colorScheme: Current color scheme.
-    /// - Returns: Theme values for disabled rendering.
+    /// - Parameter colorScheme: Current system color scheme.
+    /// - Returns: Disabled theme values.
     private static func disabled(colorScheme: ColorScheme) -> Self {
         let background = Color.secondary.opacity(Constants.DISABLED_OPACITY)
         return Self(

@@ -11,6 +11,8 @@ import ButterflyButton
 
 @main
 /// Entry point for the iOS ButterflyButton demo app.
+///
+/// Installs a simple uncaught exception handler and logs app launch for debugging.
 struct ButterflyButtoniOSDemoApp: App {
     init() {
         // Install an uncaught exception handler to surface messages in the console
@@ -32,11 +34,12 @@ struct ButterflyButtoniOSDemoApp: App {
 
 // MARK: - Demo view
 
-/// Interactive iOS demo surface for single-control and grid scenarios.
+/// Interactive iOS demo surface showcasing single-control configuration and a grid stress test.
 struct IOSDemoView: View {
 
     // MARK: Constants
 
+    /// Layout, performance, and default configuration constants for the iOS demo UI.
     private enum Constants {
         // Layout
         static let ROOT_HORIZONTAL_PADDING: CGFloat = 16
@@ -71,26 +74,29 @@ struct IOSDemoView: View {
 
     // MARK: Tab
 
+    /// Tabs available in the demo: a single control panel and a grid.
     private enum Tab { case single, grid }
 
     // MARK: Grid info panel
 
-    /// Selects the info panel shown in the Grid tab controls bar.
+    /// Selects which info panel to show in the Grid tab controls bar.
     private enum GridInfoPanel { case eventLog, matrix }
 
     // MARK: Static helpers
 
+    /// Formatter for timestamps in event log entries ("HH:mm:ss").
     private static let timestampFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
         return formatter
     }()
 
-    /// Caption-monospaced line height (≈ 16 pt) + spacing (4 pt) = 20 pt per log entry.
+    /// Caption-monospaced line height (≈ 16 pt) plus spacing (4 pt), totaling 20 pt per log entry.
     private static let logLineHeight: CGFloat = 20
 
     // MARK: State
 
+    /// Demo state backing the controls, event log, and grid configuration.
     @State private var selectedTab: Tab = .single
     /// Height of the TabView content area, captured at first render and used for log/matrix sizing.
     /// Falls back to 667 pt (iPhone SE logical height) before the first layout pass completes.
@@ -116,13 +122,14 @@ struct IOSDemoView: View {
 
     // MARK: Computed
 
-    /// Maximum height for the event log in the Single tab (~45 % of container height).
+    /// Maximum height for the event log in the Single tab (~45% of container height), in points.
     private var logMaxHeight: CGFloat { availableHeight * Constants.LOG_HEIGHT_RATIO }
-    /// Maximum height for the event log/matrix in the Grid tab controls bar (~20 % of container height).
+    /// Maximum height for the event log or matrix in the Grid tab controls bar (~20% of container height), in points.
     private var gridLogMaxHeight: CGFloat { availableHeight * Constants.GRID_LOG_HEIGHT_RATIO }
 
     // MARK: Body
 
+    /// Builds the tabbed demo interface and seeds initial grid state on appear.
     var body: some View {
         TabView(selection: $selectedTab) {
             singleControlTab
@@ -515,11 +522,18 @@ private extension IOSDemoView {
 private extension IOSDemoView {
 
     /// Writes a message to the system console via NSLog.
+    ///
+    /// - Parameter message: Message to log.
     func demoLog(_ message: String) {
         NSLog("[ButterflyDemo] %@", message)
     }
 
     /// Like precondition, but only traps in Debug builds; logs and continues in Release.
+    ///
+    /// - Parameters:
+    ///   - condition: Condition to check.
+    ///   - message: Message to log if failed.
+    /// - Returns: True if condition is met, false otherwise.
     @discardableResult
     func assertOrClamp(_ condition: @autoclosure () -> Bool, _ message: @autoclosure () -> String) -> Bool {
         #if DEBUG
@@ -594,4 +608,5 @@ private extension IOSDemoView {
         }
     }
 }
+
 

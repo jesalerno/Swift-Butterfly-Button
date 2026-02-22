@@ -2,20 +2,32 @@
 
 import Foundation
 
-/// Coordinates spin tokens and external-change animation policy.
+/// Coordinates spin sequencing, token management, and external-change animation policy.
+///
+/// The coordinator ensures that only the most recent spin is considered active and that
+/// external binding changes animate appropriately unless they originated from an internal
+/// toggle.
 struct ButterflyInteractionCoordinator {
 
-    /// Action returned by `actionForExternalStateChange` to indicate how to respond.
+    /// Describes how to react to an external state change.
+    ///
+    /// `.none` means no animation should run. `.animate(sign:)` requests an animated rotation
+    /// in the specified direction (positive or negative sign).
     enum Action: Equatable {
         case none
         case animate(sign: Double)
     }
 
+    /// Monotonically increasing token identifying the active spin.
     private(set) var spinToken: UInt64 = 0
+
+    /// The last on/off value rendered to the UI; used to detect external changes.
     private(set) var lastRenderedIsOn: Bool?
+
+    /// Set when the next external change is known to originate from an internal toggle.
     private(set) var suppressExternalChangeAnimation = false
 
-    /// Initializes coordinator state for initial render value.
+    /// Initializes coordinator state for the initial render.
     ///
     /// - Parameter isOn: Initially rendered on/off state.
     mutating func initialize(isOn: Bool) {
@@ -66,3 +78,4 @@ struct ButterflyInteractionCoordinator {
         return .animate(sign: newValue ? -1.0 : 1.0)
     }
 }
+

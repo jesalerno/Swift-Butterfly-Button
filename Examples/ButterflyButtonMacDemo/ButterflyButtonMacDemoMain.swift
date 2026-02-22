@@ -12,6 +12,7 @@ import AppKit
 @main
 /// Entry point for the macOS ButterflyButton demo app.
 struct ButterflyButtonMacDemoApp: App {
+    /// Window sizing constants for the macOS demo.
     private enum Constants {
         static let WINDOW_MIN_WIDTH: CGFloat = 980
         static let WINDOW_MIN_HEIGHT: CGFloat = 680
@@ -27,6 +28,7 @@ struct ButterflyButtonMacDemoApp: App {
 }
 
 private extension Color {
+    /// Cross-platform window background color used as an opaque fallback.
     static var platformWindowBackground: Color {
         #if canImport(AppKit)
         Color(NSColor.windowBackgroundColor)
@@ -34,6 +36,7 @@ private extension Color {
         Color(UIColor.systemBackground)
         #endif
     }
+    /// Cross-platform control background color used for panels and matrix rows.
     static var platformControlBackground: Color {
         #if canImport(AppKit)
         Color(NSColor.controlBackgroundColor)
@@ -45,8 +48,8 @@ private extension Color {
 
 // MARK: - Adaptive card background modifier
 
-/// Applies a rounded-rectangle background that uses a solid system colour when
-/// Reduce Transparency is on, and a material otherwise.
+/// Applies a rounded-rectangle background using a system material or an opaque fallback
+/// when Reduce Transparency is enabled.
 private struct AdaptiveCardModifier: ViewModifier {
     let cornerRadius: CGFloat
     let solidColor: Color
@@ -70,6 +73,13 @@ private struct AdaptiveCardModifier: ViewModifier {
 }
 
 private extension View {
+    /// Applies a rounded-rectangle background using a system material or an opaque fallback when Reduce Transparency is enabled.
+    ///
+    /// - Parameters:
+    ///   - cornerRadius: The corner radius for the rounded rectangle.
+    ///   - solid: The solid color to use when Reduce Transparency is enabled.
+    ///   - material: The system material to use as the background when Reduce Transparency is disabled.
+    /// - Returns: A view with the adaptive card background applied.
     func adaptiveCard(cornerRadius: CGFloat, solid: Color, material: some ShapeStyle) -> some View {
         modifier(AdaptiveCardModifier(cornerRadius: cornerRadius, solidColor: solid, material: material))
     }
@@ -77,11 +87,10 @@ private extension View {
 
 // MARK: - Demo view
 
-/// Interactive demo surface for single-control and grid scenarios.
+/// Interactive macOS demo showcasing a single control panel and a grid performance surface.
 struct DemoView: View {
 
-    // MARK: Constants
-
+    /// Layout, grid geometry, performance caps, and defaults for the macOS demo UI.
     private enum Constants {
         // Layout and spacing
         static let ROOT_PADDING: CGFloat = 16
@@ -120,12 +129,10 @@ struct DemoView: View {
         static let DEFAULT_GRID_DIMENSION: Int = 9
     }
 
-    // MARK: Tab
-
+    /// Tabs available in the demo UI.
     private enum Tab { case single, grid }
 
-    // MARK: Static helpers
-
+    /// HH:mm:ss formatter used for log timestamps.
     private static let timestampFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss"
@@ -153,8 +160,7 @@ struct DemoView: View {
     @State private var gridValues: [Int] = Array(repeating: 0, count: Constants.DEFAULT_GRID_DIMENSION * Constants.DEFAULT_GRID_DIMENSION)
     @State private var gridPerformanceModeEnabled: Bool = true
 
-    // MARK: Body
-
+    /// Builds the tabbed demo surface and initializes the grid on appear.
     var body: some View {
         TabView(selection: $selectedTab) {
             singleControlTab
@@ -457,11 +463,18 @@ private extension DemoView {
 private extension DemoView {
 
     /// Writes a message to the system console via NSLog.
+    ///
+    /// - Parameter message: The message to log.
     func demoLog(_ message: String) {
         NSLog("[ButterflyDemo] %@", message)
     }
 
     /// Like precondition, but only traps in Debug builds; logs and continues in Release.
+    ///
+    /// - Parameters:
+    ///   - condition: Condition to assert.
+    ///   - message: Message to log or raise on failure.
+    /// - Returns: True if condition passed, false otherwise.
     @discardableResult
     func assertOrClamp(_ condition: @autoclosure () -> Bool, _ message: @autoclosure () -> String) -> Bool {
         #if DEBUG

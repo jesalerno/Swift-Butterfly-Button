@@ -14,13 +14,21 @@ private typealias PlatformImage = NSImage
 private typealias PlatformImage = UIImage
 #endif
 
-/// Renders the square mount behind the medallion.
+/// Renders the square mount behind the medallion, including background and border.
+///
+/// This is an internal rendering primitive; it is not part of the public API surface.
 struct MountView: View {
+    /// Side length for the square mount.
     let sideLength: CGFloat
+    /// Border stroke width for the mount.
     let strokeWidth: CGFloat
+    /// Color used to draw the mount border.
     let strokeColor: Color
+    /// Background rendering mode for the mount.
     let background: MountBackground
+    /// System background color used when `.systemAutomatic` or as opaque fallback.
     let systemBackground: Color
+    /// Whether Reduce Transparency is enabled (forces opaque fallback).
     let reduceTransparencyEnabled: Bool
 
     var body: some View {
@@ -57,11 +65,17 @@ struct MountView: View {
     }
 }
 
-/// Draws the axle line for a given orientation.
+/// Draws the axle line for a given orientation using a Canvas.
+///
+/// This is an internal rendering primitive.
 struct AxleView: View {
+    /// The length of the square side containing the axle.
     let sideLength: CGFloat
+    /// The stroke width of the axle line.
     let strokeWidth: CGFloat
+    /// The orientation of the axle line (horizontal, vertical, diagonal).
     let orientation: AxleOrientation
+    /// The color used to draw the axle line.
     let color: Color
 
     var body: some View {
@@ -89,21 +103,37 @@ struct AxleView: View {
     }
 }
 
-/// Renders the spinning medallion face, label, and border.
+/// Renders the spinning medallion face, label and edge, applying 3D rotation.
+///
+/// This is an internal rendering primitive.
 struct MedallionView: View {
+    /// Diameter of the medallion circle or square side.
     let diameter: CGFloat
+    /// Stroke width of the medallion border.
     let strokeWidth: CGFloat
+    /// Background color for the top face.
     let topColor: Color
+    /// Background color for the bottom face.
     let bottomColor: Color
+    /// Color used for the medallion edge/border.
     let edgeColor: Color
+    /// Optional custom image for the top face.
     let topImage: Image?
+    /// Optional custom image for the bottom face.
     let bottomImage: Image?
+    /// Localized label displayed on the top face.
     let topLabel: LocalizedStringKey
+    /// Localized label displayed on the bottom face.
     let bottomLabel: LocalizedStringKey
+    /// Font used for the face labels.
     let labelFont: Font
+    /// Color used for the face labels.
     let labelColor: Color
+    /// Shape of the medallion (circle or square).
     let shape: MedallionShape
+    /// Current rotation angle in degrees.
     let rotationDegrees: Double
+    /// Axis of rotation for the medallion.
     let rotationAxis: ButterflyRotationAxis
 
     /// SwiftUI shape resolved from the `MedallionShape` enum,
@@ -236,6 +266,9 @@ struct MedallionView: View {
     }
 }
 
+/// Loads and caches default bundled stone images for the medallion faces.
+///
+/// Errors are logged to the OS logger when resources are missing or fail to load.
 private enum DefaultStoneImageCache {
     private static let logger = Logger(subsystem: "com.integracode.ButterflyButton", category: "resources")
 
@@ -283,13 +316,21 @@ private enum DefaultStoneImageCache {
     }
 }
 
-/// Places an optional outer label around the mount content.
+/// Places an optional outer label around the mount content at the requested placement.
+///
+/// This is an internal composition helper.
 struct OuterLabelView<Mount: View>: View {
+    /// The side length of the mount content area.
     let sideLength: CGFloat
+    /// Padding spacing between the label and mount.
     let labelPadding: CGFloat
+    /// Desired placement of the label relative to the mount.
     let placement: LabelPlacement
+    /// Whether layout is right-to-left, affects auto-placement.
     let effectiveRTL: Bool
+    /// The optional label view to display.
     let label: AnyView?
+    /// The mount view wrapped by this outer label.
     let mount: Mount
 
     var body: some View {
@@ -321,11 +362,13 @@ struct OuterLabelView<Mount: View>: View {
         }
     }
 
+    /// Resolves `.auto` to a concrete leading/trailing placement based on RTL.
     private var resolvedPlacement: LabelPlacement {
         if placement != .auto { return placement }
         return effectiveRTL ? .trailing : .leading
     }
 
+    /// Conditionally renders the provided label view when available.
     @ViewBuilder
     private var labelView: some View {
         if let label {
@@ -333,3 +376,4 @@ struct OuterLabelView<Mount: View>: View {
         }
     }
 }
+

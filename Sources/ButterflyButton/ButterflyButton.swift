@@ -31,19 +31,56 @@ public struct ButterflyButton: View {
         static let minimumHalfTurnDuration: TimeInterval = 0.05
     }
 
+    /// The bound on/off state for the control.
+    ///
+    /// When a spin completes, this value is toggled and the binding is updated.
+    /// External changes to this binding will animate according to the coordinator's policy.
     @Binding public var isOn: Bool
 
+    /// The rendered side length (width and height) of the square control, in points.
+    ///
+    /// Values smaller than the minimum hit target are clamped internally to ensure accessibility.
     public var sideLength: CGFloat = UIConstants.defaultSideLength
+
+    /// Placement for the optional outer label relative to the control.
+    ///
+    /// When set to `.auto`, leading/trailing is resolved based on the effective layout direction.
     public var labelPlacement: LabelPlacement = .auto
+
+    /// Visual style configuration for mount, axle, and medallion appearance.
     public var style: ButterflyButtonStyle = .init()
 
+    /// Total deceleration duration for the spin animation, in seconds.
+    ///
+    /// Invalid or non-positive values are normalized to a safe default.
     public var spinDecelerationDuration: TimeInterval = UIConstants.defaultSpinDuration
+
+    /// Multiplier that scales the rotational distance for a given duration.
+    ///
+    /// Must be greater than zero; invalid values fall back to a default.
     public var spinSpeed: Double = ButterflyValidation.defaultSpinSpeed
+
+    /// Enables velocity-based spin boosting for drag gestures.
+    ///
+    /// When `true`, fast drags increase the total rotation up to a capped maximum.
     public var enableFlickPhysics: Bool = true
+
+    /// Toggles haptic feedback on supported platforms during spin completion.
+    ///
+    /// Currently reserved for iOS; ignored on platforms without haptics.
     public var hapticsEnabled: Bool = true
 
+    /// Callback invoked when a spin sequence begins.
     public var onSpinBegan: (() -> Void)?
+
+    /// Callback invoked after the bound `isOn` value is updated upon spin completion.
+    ///
+    /// - Parameter isOn: The new on/off state after completion.
     public var onSpinCompleted: ((_ isOn: Bool) -> Void)?
+
+    /// Callback invoked when a full spin interaction finishes, regardless of state change.
+    ///
+    /// - Parameter isOn: The final on/off state after the interaction ends.
     public var onSpinEnded: ((_ isOn: Bool) -> Void)?
 
     private var outerLabel: AnyView?
@@ -196,6 +233,7 @@ public struct ButterflyButton: View {
 
     // MARK: - Body
 
+    /// The view hierarchy for the ButterflyButton control.
     public var body: some View {
         let resolved = resolvedValues
         OuterLabelView(
