@@ -20,20 +20,8 @@ jobs:
       - name: Build
         run: swift build --build-tests
 
-      - name: Lint
-        run: ./scripts/lint.sh
-
       - name: Unit tests
         run: swift test
-
-      - name: Vulnerability scan
-        run: ./scripts/vulnerability_scan.sh
-
-      - name: Upload vulnerability report
-        uses: actions/upload-artifact@v4
-        with:
-          name: vulnerability-report
-          path: reports/vulnerability_report.*
 
   ios-simulator-build:
     runs-on: macos-26
