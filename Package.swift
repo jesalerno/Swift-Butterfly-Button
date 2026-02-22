@@ -17,18 +17,15 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-docc-plugin.git", from: "1.0.0"),
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", from: "0.58.0"),
     ],
     targets: [
         .target(
             name: "ButterflyButton",
             resources: [.process("Resources")],
-            plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")],
         ),
         .testTarget(
             name: "ButterflyButtonTests",
             dependencies: ["ButterflyButton"],
-            plugins: [.plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")],
         ),
     ],
 )
