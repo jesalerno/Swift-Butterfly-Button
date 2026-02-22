@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -103,7 +103,6 @@
 			);
 			mainGroup = BB2000000000000000000009;
 			packageReferences = (
-				1984FB362F4A428A0021EB5C /* XCLocalSwiftPackageReference "../../../buttery-fly-button-codex" */,
 			);
 			productRefGroup = BB200000000000000000000A /* Products */;
 			projectDirPath = "";
@@ -323,13 +322,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		1984FB362F4A428A0021EB5C /* XCLocalSwiftPackageReference "../../../buttery-fly-button-codex" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../buttery-fly-button-codex";
-		};
-/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		1984FB372F4A428A0021EB5C /* ButterflyButton */ = {
